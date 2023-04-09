@@ -101,9 +101,8 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    // migracije
+    // apply new migrations on startup
     var context = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
-    context.Database.EnsureCreated();
     context.Database.MigrateAsync();
 }
 
