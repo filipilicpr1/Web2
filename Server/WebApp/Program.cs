@@ -10,6 +10,7 @@ using Services;
 using Services.Abstractions;
 using Services.Mapping;
 using System.Text;
+using WebApp.Middleware;
 
 string _cors = "cors";
 var builder = WebApplication.CreateBuilder(args);
@@ -94,6 +95,8 @@ var mapperConfig = new MapperConfiguration(mc =>
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -102,6 +105,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

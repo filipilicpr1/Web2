@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts.UserDTOs;
+using Domain.Exceptions;
 using Domain.Repositories;
 using Microsoft.Extensions.Options;
 using Services.Abstractions;
@@ -28,7 +29,7 @@ namespace Services
 
         public Task<DisplayUserDTO> RegisterUser(RegisterUserDTO registerUserDTO)
         {
-            throw new NotImplementedException();
+            throw new BadRequestException("Los zahtev");
         }
     }
 }
