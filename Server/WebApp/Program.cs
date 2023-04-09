@@ -99,6 +99,14 @@ builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    // migracije
+    var context = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
+    context.Database.EnsureCreated();
+    context.Database.MigrateAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

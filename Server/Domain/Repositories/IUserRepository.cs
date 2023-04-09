@@ -9,5 +9,7 @@ namespace Domain.Repositories
 {
     public interface IUserRepository : IGenericRepository<User>
     {
+        Task<User> FindByUsername(string username);
+        Task<User> FindByEmail(string email);
     }
 }

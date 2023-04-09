@@ -15,6 +15,7 @@ namespace Contracts.UserDTOs
         public string Password { get; set; }
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
+        public string ImageSource { get; set; }
         public string UserType { get; set; }
     }
 }

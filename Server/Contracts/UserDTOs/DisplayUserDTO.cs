@@ -15,6 +15,8 @@ namespace Contracts.UserDTOs
         public string Email { get; set; }
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
+        public string ImageSource { get; set; }
         public string UserType { get; set; }
+        public bool IsVerified { get; set; }
     }
 }

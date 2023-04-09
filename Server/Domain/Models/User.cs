@@ -19,6 +19,7 @@ namespace Domain.Models
         public string Address { get; set; }
         public UserTypes UserType { get; set; }
         public bool IsVerified { get; set; }
+        public string ImageSource { get; set; }
         public List<Order> Orders { get; set; }
     }
 }
