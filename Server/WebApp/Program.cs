@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.AppSettings;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -77,6 +78,9 @@ builder.Services.AddCors(options =>
                .AllowCredentials();
     });
 });
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.AddOptions();
 
 builder.Services.AddScoped<IUserService, UserService>();
 

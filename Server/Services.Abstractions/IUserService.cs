@@ -11,5 +11,6 @@ namespace Services.Abstractions
     {
         Task<DisplayUserDTO> RegisterUser(RegisterUserDTO registerUserDTO);
         Task<DisplayUserDTO> GetById(Guid id);
+        Task<AuthDTO> Login(LoginDTO loginDTO);
     }
 }

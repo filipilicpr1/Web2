@@ -37,5 +37,12 @@ namespace Presentation.Controllers
             DisplayUserDTO displayUserDTO = await _userService.RegisterUser(registerUserDTO);
             return CreatedAtAction(nameof(Get), new { id = displayUserDTO.Id }, displayUserDTO);
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            AuthDTO authDTO = await _userService.Login(loginDTO);
+            return Ok(authDTO);
+        }
     }
 }
