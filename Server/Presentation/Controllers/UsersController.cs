@@ -1,5 +1,6 @@
 ﻿using Contracts.UserDTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using System;
@@ -24,7 +25,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Get(Guid id)
         {
             DisplayUserDTO displayUserDTO = await _userService.GetById(id);
@@ -43,6 +44,13 @@ namespace Presentation.Controllers
         {
             AuthDTO authDTO = await _userService.Login(loginDTO);
             return Ok(authDTO);
+        }
+
+        [HttpPut("{id}/update-image")]
+        public async Task<IActionResult> UpdateImage(Guid id, [FromForm] IFormFile image)
+        {
+            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, image);
+            return Ok(displayUserDTO);
         }
     }
 }

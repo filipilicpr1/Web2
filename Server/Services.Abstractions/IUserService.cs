@@ -1,4 +1,5 @@
 ﻿using Contracts.UserDTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Services.Abstractions
         Task<DisplayUserDTO> RegisterUser(RegisterUserDTO registerUserDTO);
         Task<DisplayUserDTO> GetById(Guid id);
         Task<AuthDTO> Login(LoginDTO loginDTO);
+        Task<DisplayUserDTO> UpdateImage(Guid id, IFormFile image);
     }
 }

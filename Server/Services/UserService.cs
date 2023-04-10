@@ -5,7 +5,9 @@ using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Models;
 using Domain.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Services.Abstractions;
@@ -27,11 +29,13 @@ namespace Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IOptions<AppSettings> _settings;
-        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHostEnvironment _hostEnvironment;
+        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _hostEnvironment = hostEnvironment;
         }
         public async Task<DisplayUserDTO> GetById(Guid id)
         {
@@ -108,7 +112,7 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
-            registerUserDTO.ImageSource ??= Constants.DefaultImageSource;
+            registerUserDTO.ImageSource ??= Constants.DefaultImagePath + Constants.DefaultImageName;
 
             bool usernameExists = await _unitOfWork.Users.FindByUsername(registerUserDTO.Username) != null;
             if(usernameExists) 
@@ -130,6 +134,49 @@ namespace Services
             await _unitOfWork.Save();
             
             return _mapper.Map<DisplayUserDTO>(user);
+        }
+
+        public async Task<DisplayUserDTO> UpdateImage(Guid id, IFormFile image)
+        {
+            User user = await _unitOfWork.Users.Find(id);
+            if(user == null)
+            {
+                throw new NotFoundException("User with id " + id + " does not exist");
+            }
+
+            string currentImageName = user.ImageSource.Split('/').Last<string>();
+            if(!String.Equals(currentImageName, Constants.DefaultImageName))
+            {
+                DeleteImage(currentImageName);
+            }
+
+            string imageName = await SaveImage(image, id);
+            user.ImageSource = Constants.DefaultImagePath + imageName;
+            await _unitOfWork.Save();
+
+            return _mapper.Map<DisplayUserDTO>(user);
+        }
+
+        private async Task<string> SaveImage(IFormFile imageFile, Guid id)
+        {
+            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+            imageName = imageName + id.ToString() + Path.GetExtension(imageFile.FileName);
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "../Persistence/Images", imageName);
+            
+            using (var fileStream = new FileStream(imagePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+            
+            return imageName;
+        }
+        private void DeleteImage(string imageName)
+        {
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "../Persistence/Images", imageName);
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
         }
 
         private bool ValidateUserFields(RegisterUserDTO registerUserDTO, out string message)
@@ -228,5 +275,6 @@ namespace Services
 
             return true;
         }
+
     }
 }
