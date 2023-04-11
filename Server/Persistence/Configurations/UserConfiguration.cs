@@ -27,6 +27,12 @@ namespace Persistence.Configurations
                        x => x.ToString(),
                        x => Enum.Parse<UserTypes>(x)
                    );
+
+            builder.Property(x => x.VerificationStatus)
+                   .HasConversion(
+                       x => x.ToString(),
+                       x => Enum.Parse<VerificationStatuses>(x)
+                   );
         }
     }
 }

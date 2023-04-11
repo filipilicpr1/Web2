@@ -63,10 +63,19 @@ namespace Presentation.Controllers
         }
 
         [HttpPut("{id}/change-password")]
+        [Authorize]
         public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordDTO changePasswordDTO)
         {
             DisplayUserDTO displayUserDTO = await _userService.ChangePassword(id, User.Identity.Name, changePasswordDTO);
             return Ok(displayUserDTO);
+        }
+
+        [HttpPut("{id}/verify")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> VerifyUser(Guid id, [FromBody]  VerifyUserDTO verifyUserDTO)
+        {
+            await _userService.VerifyUser(id, verifyUserDTO.IsAccepted);
+            return Ok();
         }
     }
 }

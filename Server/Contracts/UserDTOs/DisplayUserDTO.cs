@@ -18,5 +18,6 @@ namespace Contracts.UserDTOs
         public string ImageSource { get; set; }
         public string UserType { get; set; }
         public bool IsVerified { get; set; }
+        public string VerificationStatus { get; set; }
     }
 }

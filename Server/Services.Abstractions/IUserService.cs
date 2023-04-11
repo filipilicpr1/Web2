@@ -16,5 +16,6 @@ namespace Services.Abstractions
         Task<DisplayUserDTO> UpdateImage(Guid id, string username, IFormFile image);
         Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO);
         Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO);
+        Task VerifyUser(Guid id, bool isAccepted);
     }
 }

@@ -77,11 +77,6 @@ namespace Services
                 throw new BadRequestException("Incorrect password");
             }
 
-            if(!user.IsVerified)
-            {
-                throw new BadRequestException("User is not verified");
-            }
-
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Role, user.UserType.ToString().ToLower()));
             claims.Add(new Claim(ClaimTypes.Name, user.Username));
@@ -234,6 +229,24 @@ namespace Services
             DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
             displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
             return displayUserDTO;
+        }
+
+        public async Task VerifyUser(Guid id, bool isAccepted)
+        {
+            User user = await _unitOfWork.Users.Find(id);
+            if (user == null)
+            {
+                throw new NotFoundException("User with id " + id + " does not exist");
+            }
+
+            if(user.VerificationStatus != VerificationStatuses.PENDING)
+            {
+                throw new BadRequestException("User has already been verified");
+            }
+
+            user.IsVerified = isAccepted;
+            user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
+            await _unitOfWork.Save();
         }
 
         private async Task<string> SaveImage(IFormFile imageFile, Guid id)
