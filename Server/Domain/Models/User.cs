@@ -21,5 +21,6 @@ namespace Domain.Models
         public bool IsVerified { get; set; }
         public string ImageSource { get; set; }
         public List<Order> Orders { get; set; }
+        public List<Article> Articles { get; set; }
     }
 }

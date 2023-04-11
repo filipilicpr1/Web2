@@ -18,6 +18,11 @@ namespace Persistence.Configurations
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.Price).HasPrecision(4, 2);
+
+            builder.HasOne(x => x.Seller)
+               .WithMany(x => x.Articles)
+               .HasForeignKey(x => x.SellerId)
+               .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

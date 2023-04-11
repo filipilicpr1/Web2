@@ -45,7 +45,9 @@ namespace Services
                 throw new NotFoundException("User with id " + id + " does not exist");
             }
 
-            return _mapper.Map<DisplayUserDTO>(user);
+            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
+            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
+            return displayUserDTO;
         }
 
         public async Task<AuthDTO> Login(LoginDTO loginDTO)
@@ -112,7 +114,7 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
-            registerUserDTO.ImageSource ??= Constants.DefaultImagePath + Constants.DefaultImageName;
+            registerUserDTO.ImageSource ??= Constants.DefaultImageName;
 
             bool usernameExists = await _unitOfWork.Users.FindByUsername(registerUserDTO.Username) != null;
             if(usernameExists) 
@@ -132,16 +134,91 @@ namespace Services
             
             await _unitOfWork.Users.Add(user);
             await _unitOfWork.Save();
-            
-            return _mapper.Map<DisplayUserDTO>(user);
+
+            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
+            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
+            return displayUserDTO;
         }
 
-        public async Task<DisplayUserDTO> UpdateImage(Guid id, IFormFile image)
+        public async Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO)
+        {
+            User user = await _unitOfWork.Users.Find(id);
+            if (user == null)
+            {
+                throw new NotFoundException("User with id " + id + " does not exist");
+            }
+
+            if (!String.Equals(user.Username, username))
+            {
+                throw new BadRequestException("You can only change your info");
+            }
+
+            string errorMessage;
+            bool userFiledsAreValid = ValidateBasicFields(updateUserDTO.Name,
+                                                          updateUserDTO.LastName, 
+                                                          updateUserDTO.Address, 
+                                                          updateUserDTO.BirthDate, 
+                                                          out errorMessage);
+            if (!userFiledsAreValid)
+            {
+                throw new BadRequestException(errorMessage);
+            }
+
+            user.Name = updateUserDTO.Name;
+            user.LastName = updateUserDTO.LastName;
+            user.Address = updateUserDTO.Address;
+            user.BirthDate = updateUserDTO.BirthDate;
+            await _unitOfWork.Save();
+
+            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
+            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
+            return displayUserDTO;
+        }
+
+        public async Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO)
+        {
+            User user = await _unitOfWork.Users.Find(id);
+            if (user == null)
+            {
+                throw new NotFoundException("User with id " + id + " does not exist");
+            }
+
+            if (!String.Equals(user.Username, username))
+            {
+                throw new BadRequestException("You can only change your password");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(changePasswordDTO.CurrentPassword, user.Password))
+            {
+                throw new BadRequestException("Incorrect current password");
+            }
+
+            string message;
+            bool passwordIsValid = ValidatePassword(changePasswordDTO.NewPassword, out message);
+            if(!passwordIsValid)
+            {
+                throw new BadRequestException(message);
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.NewPassword, BCrypt.Net.BCrypt.GenerateSalt());
+            await _unitOfWork.Save();
+
+            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
+            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
+            return displayUserDTO;
+        }
+
+        public async Task<DisplayUserDTO> UpdateImage(Guid id, string username, IFormFile image)
         {
             User user = await _unitOfWork.Users.Find(id);
             if(user == null)
             {
                 throw new NotFoundException("User with id " + id + " does not exist");
+            }
+
+            if(!String.Equals(user.Username, username))
+            {
+                throw new BadRequestException("You can only change your image");
             }
 
             string currentImageName = user.ImageSource.Split('/').Last<string>();
@@ -151,10 +228,12 @@ namespace Services
             }
 
             string imageName = await SaveImage(image, id);
-            user.ImageSource = Constants.DefaultImagePath + imageName;
+            user.ImageSource = imageName;
             await _unitOfWork.Save();
 
-            return _mapper.Map<DisplayUserDTO>(user);
+            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
+            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
+            return displayUserDTO;
         }
 
         private async Task<string> SaveImage(IFormFile imageFile, Guid id)
@@ -170,6 +249,7 @@ namespace Services
             
             return imageName;
         }
+
         private void DeleteImage(string imageName)
         {
             var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "../Persistence/Images", imageName);
@@ -195,35 +275,23 @@ namespace Services
                 return false;
             }
 
+            bool basicFieldsAreValid = ValidateBasicFields(registerUserDTO.Name,
+                                                           registerUserDTO.LastName, 
+                                                           registerUserDTO.Address, 
+                                                           registerUserDTO.BirthDate, 
+                                                           out message);
+            if (!basicFieldsAreValid) 
+            {
+                return false;
+            }
+
             if (String.IsNullOrWhiteSpace(registerUserDTO.Username))
             {
                 message = "Username can't be empty";
                 return false;
             }
 
-            if (String.IsNullOrWhiteSpace(registerUserDTO.Name))
-            {
-                message = "Name can't be empty";
-                return false;
-            }
-
-            if (String.IsNullOrWhiteSpace(registerUserDTO.LastName))
-            {
-                message = "Last name can't be empty";
-                return false;
-            }
-
-            if (String.IsNullOrWhiteSpace(registerUserDTO.Address))
-            {
-                message = "Address can't be empty";
-                return false;
-            }            
-
-            if (registerUserDTO.BirthDate.Year < Constants.MinBirthYear || registerUserDTO.BirthDate > DateTime.Now)
-            {
-                message = "Invalid birth date";
-                return false;
-            }    
+            
 
             if (registerUserDTO.UserType == null || (!String.Equals(registerUserDTO.UserType.Trim().ToLower(), "admin") && 
                                                      !String.Equals(registerUserDTO.UserType.Trim().ToLower(), "seller") && 
@@ -276,5 +344,35 @@ namespace Services
             return true;
         }
 
+        private bool ValidateBasicFields(string name, string lastName, string address, DateTime birthDate, out string message)
+        {
+            message = "";
+
+            if (String.IsNullOrWhiteSpace(name))
+            {
+                message = "Name can't be empty";
+                return false;
+            }
+
+            if (String.IsNullOrWhiteSpace(lastName))
+            {
+                message = "Last name can't be empty";
+                return false;
+            }
+
+            if (String.IsNullOrWhiteSpace(address))
+            {
+                message = "Address can't be empty";
+                return false;
+            }
+
+            if (birthDate.Year < Constants.MinBirthYear || birthDate > DateTime.Now)
+            {
+                message = "Invalid birth date";
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Get(Guid id)
         {
             DisplayUserDTO displayUserDTO = await _userService.GetById(id);
@@ -39,6 +39,14 @@ namespace Presentation.Controllers
             return CreatedAtAction(nameof(Get), new { id = displayUserDTO.Id }, displayUserDTO);
         }
 
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Put(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
+        {
+            DisplayUserDTO displayUserDTO = await _userService.UpdateUser(id, User.Identity.Name, updateUserDTO);
+            return Ok(displayUserDTO);
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
@@ -47,9 +55,17 @@ namespace Presentation.Controllers
         }
 
         [HttpPut("{id}/update-image")]
+        [Authorize]
         public async Task<IActionResult> UpdateImage(Guid id, [FromForm] IFormFile image)
         {
-            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, image);
+            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, User.Identity.Name, image);
+            return Ok(displayUserDTO);
+        }
+
+        [HttpPut("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            DisplayUserDTO displayUserDTO = await _userService.ChangePassword(id, User.Identity.Name, changePasswordDTO);
             return Ok(displayUserDTO);
         }
     }

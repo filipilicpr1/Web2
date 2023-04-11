@@ -34,6 +34,9 @@ namespace WebApp.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageSource")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -41,7 +44,12 @@ namespace WebApp.Migrations
                         .HasPrecision(4, 2)
                         .HasColumnType("float(4)");
 
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SellerId");
 
                     b.ToTable("Articles");
                 });
@@ -140,6 +148,17 @@ namespace WebApp.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Domain.Models.Article", b =>
+                {
+                    b.HasOne("Domain.Models.User", "Seller")
+                        .WithMany("Articles")
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("Domain.Models.Order", b =>
                 {
                     b.HasOne("Domain.Models.Article", "Article")
@@ -166,6 +185,8 @@ namespace WebApp.Migrations
 
             modelBuilder.Entity("Domain.Models.User", b =>
                 {
+                    b.Navigation("Articles");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
