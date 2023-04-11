@@ -125,6 +125,7 @@ namespace Services
 
             User user = _mapper.Map<User>(registerUserDTO);
             user.IsVerified = user.UserType != UserTypes.SELLER;
+            user.VerificationStatus = user.IsVerified ? VerificationStatuses.ACCEPTED : VerificationStatuses.PENDING;
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, BCrypt.Net.BCrypt.GenerateSalt());
             
             await _unitOfWork.Users.Add(user);
