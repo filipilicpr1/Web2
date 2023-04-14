@@ -214,10 +214,10 @@ namespace Services
             string currentImageName = user.ImageSource.Split('/').Last<string>();
             if(!String.Equals(currentImageName, Constants.DefaultImageName))
             {
-                DeleteImage(currentImageName);
+                ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
             }
 
-            string imageName = await SaveImage(image, id);
+            string imageName = await ImageHelper.SaveImage(image, id, _hostEnvironment.ContentRootPath);
             user.ImageSource = imageName;
             await _unitOfWork.Save();
 
@@ -279,29 +279,6 @@ namespace Services
                 Page = page,
                 TotalPages = totalPages
             };
-        }
-
-        private async Task<string> SaveImage(IFormFile imageFile, Guid id)
-        {
-            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
-            imageName = imageName + id.ToString() + Path.GetExtension(imageFile.FileName);
-            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "../Persistence/Images", imageName);
-            
-            using (var fileStream = new FileStream(imagePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
-            
-            return imageName;
-        }
-
-        private void DeleteImage(string imageName)
-        {
-            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "../Persistence/Images", imageName);
-            if (System.IO.File.Exists(imagePath))
-            {
-                System.IO.File.Delete(imagePath);
-            }
         }
 
         private bool ValidateUserFields(RegisterUserDTO registerUserDTO, out string message)

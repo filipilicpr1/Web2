@@ -14,6 +14,7 @@ namespace Services.Mapping
         public UserMappingProfile()
         {
             CreateMap<User, DisplayUserDTO>().ForMember(dest => dest.ImageSource, opt=>opt.MapFrom(src => Constants.DefaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<User, RestrictedDisplayUserDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => Constants.DefaultImagePath + src.ImageSource)).ReverseMap();
             CreateMap<User, RegisterUserDTO>().ReverseMap();
         }
     }

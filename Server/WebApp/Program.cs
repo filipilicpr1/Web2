@@ -84,6 +84,7 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 builder.Services.AddOptions();
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -95,6 +96,7 @@ builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new UserMappingProfile());
+    mc.AddProfile(new ProductMappingProfile());
 });
 
 IMapper mapper = mapperConfig.CreateMapper();
