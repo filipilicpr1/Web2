@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts.Common;
 using Contracts.ProductDTOs;
+using Contracts.UserDTOs;
 using Domain.AppSettings;
 using Domain.Enums;
 using Domain.Exceptions;
@@ -87,6 +88,49 @@ namespace Services
         {
             IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailedBySeller(id);
             return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, Constants.ProductsPageSize, _mapper);
+        }
+
+        public async Task<DisplayProductDTO> UpdateProduct(Guid id, string sellerUsername, UpdateProductDTO updateProductDTO)
+        {
+            Product product = await _unitOfWork.Products.GetDetailed(id);
+            if(product == null || product.IsDeleted)
+            {
+                throw new NotFoundException("Product with id " + id + " does not exist");
+            }
+
+            if(!String.Equals(product.Seller.Username, sellerUsername))
+            {
+                throw new BadRequestException("You can only update your products");
+            }
+
+            string errorMessage;
+            bool productFieldsAreValid = ValidateProductFields(updateProductDTO.Name,
+                                                               updateProductDTO.Description,
+                                                               updateProductDTO.Price,
+                                                               updateProductDTO.Amount,
+                                                               out errorMessage);
+            if (!productFieldsAreValid)
+            {
+                throw new BadRequestException(errorMessage);
+            }
+
+            string currentImageName = product.ImageSource.Split('/').Last<string>();
+            if (!String.Equals(currentImageName, Constants.DefaultProductImageName) && updateProductDTO.Image != null)
+            {
+                ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
+            }
+
+            product.ImageSource = updateProductDTO.Image == null ?
+                                  product.ImageSource :
+                                  await ImageHelper.SaveImage(updateProductDTO.Image, id, _hostEnvironment.ContentRootPath);
+
+            product.Name = updateProductDTO.Name;
+            product.Description = updateProductDTO.Description;
+            product.Price = updateProductDTO.Price;
+            product.Amount = updateProductDTO.Amount;
+            await _unitOfWork.Save();
+
+            return _mapper.Map<DisplayProductDTO>(product);
         }
 
         private bool ValidateProductFields(string name, string  description, double price, int amount, out string message) 

@@ -14,5 +14,6 @@ namespace Services.Abstractions
         Task<DisplayProductDTO> GetById(Guid id);
         Task<PagedListDTO<DisplayProductDTO>> GetAll(int page);
         Task<PagedListDTO<DisplayProductDTO>> GetAllBySeller(Guid id, int page);
+        Task<DisplayProductDTO> UpdateProduct(Guid id, string sellerUsername, UpdateProductDTO updateProductDTO);
     }
 }

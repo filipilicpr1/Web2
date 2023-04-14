@@ -56,5 +56,13 @@ namespace Presentation.Controllers
             PagedListDTO<DisplayProductDTO> pagedProducts = await _productService.GetAllBySeller(id, page);
             return Ok(pagedProducts);
         }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> Put(Guid id, [FromForm] UpdateProductDTO updateProductDTO)
+        {
+            DisplayProductDTO displayProductDTO = await _productService.UpdateProduct(id, User.Identity.Name, updateProductDTO);
+            return Ok(displayProductDTO);
+        }
     }
 }
