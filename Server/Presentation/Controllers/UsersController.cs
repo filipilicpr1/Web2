@@ -77,5 +77,21 @@ namespace Presentation.Controllers
             await _userService.VerifyUser(id, verifyUserDTO.IsAccepted);
             return Ok();
         }
+
+        [HttpGet("sellers")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetSellers()
+        {
+            IReadOnlyList<DisplayUserDTO> displayUsers = await _userService.GetAllSellers();
+            return Ok(displayUsers);
+        }
+
+        [HttpGet("sellers/verified")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetVerifiedSellers()
+        {
+            IReadOnlyList<DisplayUserDTO> displayUsers = await _userService.GetVerifiedSellers();
+            return Ok(displayUsers);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain.Enums;
+using Domain.Models;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,6 +27,14 @@ namespace Persistence.Repositories
         {
             User user = await _dbContext.Users.FirstOrDefaultAsync(e => String.Equals(e.Username, username));
             return user;
+        }
+
+        public async Task<IEnumerable<User>> GetSellers(bool onlyVerified)
+        {
+            IEnumerable<User> users = await _dbContext.Users
+                                                      .Where(user => user.UserType == UserTypes.SELLER && (!onlyVerified || user.VerificationStatus == VerificationStatuses.ACCEPTED))
+                                                      .ToListAsync();
+            return users;
         }
     }
 }

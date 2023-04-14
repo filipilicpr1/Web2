@@ -20,6 +20,8 @@ namespace Persistence.Configurations
 
             builder.Property(x => x.Price).HasPrecision(4, 2);
 
+            builder.Property(x => x.RowVersion).IsRowVersion();
+
             builder.Property(x => x.Status)
                    .HasConversion(
                        x => x.ToString(),

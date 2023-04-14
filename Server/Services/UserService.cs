@@ -45,9 +45,7 @@ namespace Services
                 throw new NotFoundException("User with id " + id + " does not exist");
             }
 
-            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
-            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
-            return displayUserDTO;
+            return _mapper.Map<DisplayUserDTO>(user);
         }
 
         public async Task<AuthDTO> Login(LoginDTO loginDTO)
@@ -131,9 +129,7 @@ namespace Services
             await _unitOfWork.Users.Add(user);
             await _unitOfWork.Save();
 
-            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
-            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
-            return displayUserDTO;
+            return _mapper.Map<DisplayUserDTO>(user);
         }
 
         public async Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO)
@@ -166,9 +162,7 @@ namespace Services
             user.BirthDate = updateUserDTO.BirthDate;
             await _unitOfWork.Save();
 
-            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
-            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
-            return displayUserDTO;
+            return _mapper.Map<DisplayUserDTO>(user);
         }
 
         public async Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO)
@@ -199,9 +193,7 @@ namespace Services
             user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.NewPassword, BCrypt.Net.BCrypt.GenerateSalt());
             await _unitOfWork.Save();
 
-            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
-            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
-            return displayUserDTO;
+            return _mapper.Map<DisplayUserDTO>(user);
         }
 
         public async Task<DisplayUserDTO> UpdateImage(Guid id, string username, IFormFile image)
@@ -227,9 +219,7 @@ namespace Services
             user.ImageSource = imageName;
             await _unitOfWork.Save();
 
-            DisplayUserDTO displayUserDTO = _mapper.Map<DisplayUserDTO>(user);
-            displayUserDTO.ImageSource = Constants.DefaultImagePath + user.ImageSource;
-            return displayUserDTO;
+            return _mapper.Map<DisplayUserDTO>(user);
         }
 
         public async Task VerifyUser(Guid id, bool isAccepted)
@@ -248,6 +238,17 @@ namespace Services
             user.IsVerified = isAccepted;
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
+        }
+        public async Task<IReadOnlyList<DisplayUserDTO>> GetAllSellers()
+        {
+            IEnumerable<User> users = await _unitOfWork.Users.GetSellers(false);
+            return _mapper.Map<IReadOnlyList<DisplayUserDTO>>(users);
+        }
+
+        public async Task<IReadOnlyList<DisplayUserDTO>> GetVerifiedSellers()
+        {
+            IEnumerable<User> users = await _unitOfWork.Users.GetSellers(true);
+            return _mapper.Map<IReadOnlyList<DisplayUserDTO>>(users);
         }
 
         private async Task<string> SaveImage(IFormFile imageFile, Guid id)

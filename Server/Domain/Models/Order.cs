@@ -21,5 +21,6 @@ namespace Domain.Models
         public DateTime OrderTime { get; set; }
         public DateTime DeliveryTime { get; set; }
         public OrderStatuses Status { get; set; }
+        public byte[] RowVersion { get; set; }
     }
 }

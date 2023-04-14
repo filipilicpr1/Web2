@@ -16,6 +16,8 @@ namespace Domain.Models
         public string ImageSource { get; set; }
         public Guid SellerId { get; set; }
         public User Seller { get; set; }
+        public bool IsDeleted { get; set; }
         public List<Order> Orders { get; set; }
+        public byte[] RowVersion { get; set; }
     }
 }

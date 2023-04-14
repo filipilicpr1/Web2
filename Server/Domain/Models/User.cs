@@ -23,5 +23,6 @@ namespace Domain.Models
         public string ImageSource { get; set; }
         public List<Order> Orders { get; set; }
         public List<Article> Articles { get; set; }
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace Domain.Repositories
     {
         Task<User> FindByUsername(string username);
         Task<User> FindByEmail(string email);
+        Task<IEnumerable<User>> GetSellers(bool onlyVerified); 
     }
 }

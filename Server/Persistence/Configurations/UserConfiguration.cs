@@ -22,6 +22,8 @@ namespace Persistence.Configurations
 
             builder.HasIndex(x => x.Email).IsUnique();
 
+            builder.Property(x => x.RowVersion).IsRowVersion();
+
             builder.Property(x => x.UserType)
                    .HasConversion(
                        x => x.ToString(),

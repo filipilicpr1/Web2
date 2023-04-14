@@ -17,5 +17,7 @@ namespace Services.Abstractions
         Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO);
         Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO);
         Task VerifyUser(Guid id, bool isAccepted);
+        Task<IReadOnlyList<DisplayUserDTO>> GetAllSellers();
+        Task<IReadOnlyList<DisplayUserDTO>> GetVerifiedSellers();
     }
 }
