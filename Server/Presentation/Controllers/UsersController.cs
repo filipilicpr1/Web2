@@ -1,4 +1,5 @@
-﻿using Contracts.UserDTOs;
+﻿using Contracts.Common;
+using Contracts.UserDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -80,17 +81,17 @@ namespace Presentation.Controllers
 
         [HttpGet("sellers")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetSellers()
+        public async Task<IActionResult> GetSellers([FromQuery] int page)
         {
-            IReadOnlyList<DisplayUserDTO> displayUsers = await _userService.GetAllSellers();
+            PagedListDTO<DisplayUserDTO> displayUsers = await _userService.GetAllSellers(page);
             return Ok(displayUsers);
         }
 
         [HttpGet("sellers/verified")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetVerifiedSellers()
+        public async Task<IActionResult> GetVerifiedSellers([FromQuery] int page)
         {
-            IReadOnlyList<DisplayUserDTO> displayUsers = await _userService.GetVerifiedSellers();
+            PagedListDTO<DisplayUserDTO> displayUsers = await _userService.GetVerifiedSellers(page);
             return Ok(displayUsers);
         }
     }

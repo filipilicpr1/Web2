@@ -16,5 +16,7 @@ namespace Services
         public const string DefaultImagePath = "https://localhost:7126/Images/";
 
         public const string DefaultImageName = "default.jpg";
+
+        public const int UsersPageSize = 4;
     }
 }

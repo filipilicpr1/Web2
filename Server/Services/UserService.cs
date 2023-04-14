@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Contracts.Common;
 using Contracts.UserDTOs;
 using Domain.AppSettings;
+using Domain.Common;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Models;
@@ -239,16 +241,44 @@ namespace Services
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
         }
-        public async Task<IReadOnlyList<DisplayUserDTO>> GetAllSellers()
+        public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(false);
-            return _mapper.Map<IReadOnlyList<DisplayUserDTO>>(users);
+
+            int count = users.Count();
+            int totalPages = (int)Math.Ceiling(count / (double)Constants.UsersPageSize);
+            page = page < 1 ? 1 : page;
+            page = page > totalPages ? totalPages : page;
+            List<User> pagedUsers = count == 0 ? users.ToList() : users.Skip((page - 1) * Constants.UsersPageSize)
+                                                                       .Take(Constants.UsersPageSize)
+                                                                       .ToList();
+
+            return new PagedListDTO<DisplayUserDTO>()
+            {
+                Items = _mapper.Map<IReadOnlyList<DisplayUserDTO>>(pagedUsers),
+                Page = page,
+                TotalPages = totalPages
+            };
         }
 
-        public async Task<IReadOnlyList<DisplayUserDTO>> GetVerifiedSellers()
+        public async Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(true);
-            return _mapper.Map<IReadOnlyList<DisplayUserDTO>>(users);
+
+            int count = users.Count();
+            int totalPages = (int)Math.Ceiling(count / (double)Constants.UsersPageSize);
+            page = page < 1 ? 1 : page;
+            page = page > totalPages ? totalPages : page;
+            List<User> pagedUsers = count == 0 ? users.ToList() : users.Skip((page - 1) * Constants.UsersPageSize)
+                                                                       .Take(Constants.UsersPageSize)
+                                                                       .ToList();
+
+            return new PagedListDTO<DisplayUserDTO>()
+            {
+                Items = _mapper.Map<IReadOnlyList<DisplayUserDTO>>(pagedUsers),
+                Page = page,
+                TotalPages = totalPages
+            };
         }
 
         private async Task<string> SaveImage(IFormFile imageFile, Guid id)

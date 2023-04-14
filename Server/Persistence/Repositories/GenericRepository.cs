@@ -28,9 +28,9 @@ namespace Persistence.Repositories
             return entity;
         }
 
-        public async Task<List<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAll()
         {
-            List<T> entities = await _dbContext.Set<T>().ToListAsync();
+            IEnumerable<T> entities = await _dbContext.Set<T>().ToListAsync();
             return entities;
         }
 

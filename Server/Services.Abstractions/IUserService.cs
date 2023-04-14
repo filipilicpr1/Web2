@@ -1,4 +1,5 @@
-﻿using Contracts.UserDTOs;
+﻿using Contracts.Common;
+using Contracts.UserDTOs;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Services.Abstractions
         Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO);
         Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO);
         Task VerifyUser(Guid id, bool isAccepted);
-        Task<IReadOnlyList<DisplayUserDTO>> GetAllSellers();
-        Task<IReadOnlyList<DisplayUserDTO>> GetVerifiedSellers();
+        Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page);
+        Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page);
     }
 }
