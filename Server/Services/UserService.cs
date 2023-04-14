@@ -23,6 +23,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Services
 {
@@ -158,6 +159,16 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
+            string currentImageName = user.ImageSource.Split('/').Last<string>();
+            if (!String.Equals(currentImageName, Constants.DefaultImageName) && updateUserDTO.Image != null)
+            {
+                ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
+            }
+
+            user.ImageSource = updateUserDTO.Image == null ? 
+                               user.ImageSource : 
+                               await ImageHelper.SaveImage(updateUserDTO.Image, id, _hostEnvironment.ContentRootPath);
+
             user.Name = updateUserDTO.Name;
             user.LastName = updateUserDTO.LastName;
             user.Address = updateUserDTO.Address;
@@ -193,32 +204,6 @@ namespace Services
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.NewPassword, BCrypt.Net.BCrypt.GenerateSalt());
-            await _unitOfWork.Save();
-
-            return _mapper.Map<DisplayUserDTO>(user);
-        }
-
-        public async Task<DisplayUserDTO> UpdateImage(Guid id, string username, IFormFile image)
-        {
-            User user = await _unitOfWork.Users.Find(id);
-            if(user == null)
-            {
-                throw new NotFoundException("User with id " + id + " does not exist");
-            }
-
-            if(!String.Equals(user.Username, username))
-            {
-                throw new BadRequestException("You can only change your image");
-            }
-
-            string currentImageName = user.ImageSource.Split('/').Last<string>();
-            if(!String.Equals(currentImageName, Constants.DefaultImageName))
-            {
-                ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
-            }
-
-            string imageName = await ImageHelper.SaveImage(image, id, _hostEnvironment.ContentRootPath);
-            user.ImageSource = imageName;
             await _unitOfWork.Save();
 
             return _mapper.Map<DisplayUserDTO>(user);

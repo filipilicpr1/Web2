@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace Contracts.UserDTOs
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

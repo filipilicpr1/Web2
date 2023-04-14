@@ -42,7 +42,7 @@ namespace Presentation.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Put(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> Put(Guid id, [FromForm] UpdateUserDTO updateUserDTO)
         {
             DisplayUserDTO displayUserDTO = await _userService.UpdateUser(id, User.Identity.Name, updateUserDTO);
             return Ok(displayUserDTO);
@@ -53,14 +53,6 @@ namespace Presentation.Controllers
         {
             AuthDTO authDTO = await _userService.Login(loginDTO);
             return Ok(authDTO);
-        }
-
-        [HttpPut("{id}/update-image")]
-        [Authorize]
-        public async Task<IActionResult> UpdateImage(Guid id, [FromForm] UpdateImageDTO updateImageDTO)
-        {
-            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, User.Identity.Name, updateImageDTO.Image);
-            return Ok(displayUserDTO);
         }
 
         [HttpPut("{id}/change-password")]
