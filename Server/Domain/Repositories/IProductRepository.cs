@@ -10,5 +10,7 @@ namespace Domain.Repositories
     public interface IProductRepository : IGenericRepository<Product>
     {
         Task<Product> GetDetailed(Guid id);
+        Task<IEnumerable<Product>> GetAllDetailed();
+        Task<IEnumerable<Product>> GetAllDetailedBySeller(Guid id);
     }
 }

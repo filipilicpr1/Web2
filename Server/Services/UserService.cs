@@ -2,7 +2,6 @@
 using Contracts.Common;
 using Contracts.UserDTOs;
 using Domain.AppSettings;
-using Domain.Common;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Models;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Services.Abstractions;
+using Services.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -244,41 +244,13 @@ namespace Services
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(false);
-
-            int count = users.Count();
-            int totalPages = (int)Math.Ceiling(count / (double)Constants.UsersPageSize);
-            page = page < 1 ? 1 : page;
-            page = page > totalPages ? totalPages : page;
-            List<User> pagedUsers = count == 0 ? users.ToList() : users.Skip((page - 1) * Constants.UsersPageSize)
-                                                                       .Take(Constants.UsersPageSize)
-                                                                       .ToList();
-
-            return new PagedListDTO<DisplayUserDTO>()
-            {
-                Items = _mapper.Map<IReadOnlyList<DisplayUserDTO>>(pagedUsers),
-                Page = page,
-                TotalPages = totalPages
-            };
+            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, Constants.UsersPageSize, _mapper);
         }
 
         public async Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(true);
-
-            int count = users.Count();
-            int totalPages = (int)Math.Ceiling(count / (double)Constants.UsersPageSize);
-            page = page < 1 ? 1 : page;
-            page = page > totalPages ? totalPages : page;
-            List<User> pagedUsers = count == 0 ? users.ToList() : users.Skip((page - 1) * Constants.UsersPageSize)
-                                                                       .Take(Constants.UsersPageSize)
-                                                                       .ToList();
-
-            return new PagedListDTO<DisplayUserDTO>()
-            {
-                Items = _mapper.Map<IReadOnlyList<DisplayUserDTO>>(pagedUsers),
-                Page = page,
-                TotalPages = totalPages
-            };
+            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, Constants.UsersPageSize, _mapper);
         }
 
         private bool ValidateUserFields(RegisterUserDTO registerUserDTO, out string message)

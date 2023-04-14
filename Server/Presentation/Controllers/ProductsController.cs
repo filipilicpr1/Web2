@@ -40,5 +40,21 @@ namespace Presentation.Controllers
             DisplayProductDTO displayProductDTO = await _productService.CreateProduct(createProductDTO, User.Identity.Name);
             return CreatedAtAction(nameof(Get), new { id = displayProductDTO.Id }, displayProductDTO);
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAll(int page)
+        {
+            PagedListDTO<DisplayProductDTO> pagedProducts = await _productService.GetAll(page);
+            return Ok(pagedProducts);
+        }
+
+        [HttpGet("seller/{id}")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> GetAll(Guid id, [FromQuery]int page)
+        {
+            PagedListDTO<DisplayProductDTO> pagedProducts = await _productService.GetAllBySeller(id, page);
+            return Ok(pagedProducts);
+        }
     }
 }

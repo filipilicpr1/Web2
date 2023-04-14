@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Services.Helpers
 {
     internal class ImageHelper
     {
         public static async Task<string> SaveImage(IFormFile imageFile, Guid id, string rootPath)
         {
-            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+            string imageName = new string(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
             imageName = imageName + id.ToString() + Path.GetExtension(imageFile.FileName);
             var imagePath = Path.Combine(rootPath, "../Persistence/Images", imageName);
 
@@ -27,9 +27,9 @@ namespace Services
         public static void DeleteImage(string imageName, string rootPath)
         {
             var imagePath = Path.Combine(rootPath, "../Persistence/Images", imageName);
-            if (System.IO.File.Exists(imagePath))
+            if (File.Exists(imagePath))
             {
-                System.IO.File.Delete(imagePath);
+                File.Delete(imagePath);
             }
         }
     }

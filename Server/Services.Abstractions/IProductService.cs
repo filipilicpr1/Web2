@@ -1,4 +1,5 @@
-﻿using Contracts.ProductDTOs;
+﻿using Contracts.Common;
+using Contracts.ProductDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace Services.Abstractions
     {
         Task<DisplayProductDTO> CreateProduct(CreateProductDTO createProductDTO, string sellerUsername);
         Task<DisplayProductDTO> GetById(Guid id);
+        Task<PagedListDTO<DisplayProductDTO>> GetAll(int page);
+        Task<PagedListDTO<DisplayProductDTO>> GetAllBySeller(Guid id, int page);
     }
 }

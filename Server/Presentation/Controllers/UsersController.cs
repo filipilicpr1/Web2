@@ -57,9 +57,9 @@ namespace Presentation.Controllers
 
         [HttpPut("{id}/update-image")]
         [Authorize]
-        public async Task<IActionResult> UpdateImage(Guid id, [FromForm] IFormFile image)
+        public async Task<IActionResult> UpdateImage(Guid id, [FromForm] UpdateImageDTO updateImageDTO)
         {
-            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, User.Identity.Name, image);
+            DisplayUserDTO displayUserDTO = await _userService.UpdateImage(id, User.Identity.Name, updateImageDTO.Image);
             return Ok(displayUserDTO);
         }
 

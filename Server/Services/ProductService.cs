@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Contracts.Common;
 using Contracts.ProductDTOs;
 using Domain.AppSettings;
 using Domain.Enums;
@@ -8,6 +9,7 @@ using Domain.Repositories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Services.Abstractions;
+using Services.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +76,17 @@ namespace Services
             await _unitOfWork.Save();
             
             return _mapper.Map<DisplayProductDTO>(product);
+        }
+        public async Task<PagedListDTO<DisplayProductDTO>> GetAll(int page)
+        {
+            IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailed();
+            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, Constants.ProductsPageSize, _mapper);
+        }
+
+        public async Task<PagedListDTO<DisplayProductDTO>> GetAllBySeller(Guid id, int page)
+        {
+            IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailedBySeller(id);
+            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, Constants.ProductsPageSize, _mapper);
         }
 
         private bool ValidateProductFields(string name, string  description, double price, int amount, out string message) 

@@ -20,5 +20,7 @@ namespace Services
         public const string DefaultProductImageName = "default_product.png";
 
         public const int UsersPageSize = 4;
+
+        public const int ProductsPageSize = 4;
     }
 }
