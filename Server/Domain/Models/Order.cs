@@ -12,8 +12,8 @@ namespace Domain.Models
         public Guid Id { get; set; }
         public string Comment { get; set; }
         public string DeliveryAddress { get; set; }
-        public Guid ArticleId { get; set; }
-        public Article Article { get; set; }
+        public Guid ProductId { get; set; }
+        public Product Product { get; set; }
         public int Amount { get; set; }
         public double Price { get; set; }
         public Guid BuyerId { get; set; }

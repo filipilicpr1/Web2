@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Persistence.Repositories
 {
-    public class ArticleRepository : GenericRepository<Article>, IArticleRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
-        public ArticleRepository(ProjectDbContext dbContext) : base(dbContext)
+        public ProductRepository(ProjectDbContext dbContext) : base(dbContext)
         {
 
         }

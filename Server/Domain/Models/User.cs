@@ -22,7 +22,7 @@ namespace Domain.Models
         public VerificationStatuses VerificationStatus { get; set; }
         public string ImageSource { get; set; }
         public List<Order> Orders { get; set; }
-        public List<Article> Articles { get; set; }
+        public List<Product> Products { get; set; }
         public byte[] RowVersion { get; set; }
     }
 }

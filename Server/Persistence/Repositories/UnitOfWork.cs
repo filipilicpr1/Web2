@@ -11,17 +11,17 @@ namespace Persistence.Repositories
     {
         private readonly ProjectDbContext _dbContext;
         public IUserRepository Users { get; }
-        public IArticleRepository Articles { get; }
+        public IProductRepository Products { get; }
         public IOrderRepository Orders { get; }
 
         public UnitOfWork(ProjectDbContext dbContext,
                           IUserRepository users,
-                          IArticleRepository articles,
+                          IProductRepository products,
                           IOrderRepository orders)
         {
             _dbContext = dbContext;
             Users = users;
-            Articles = articles;
+            Products = products;
             Orders = orders;
         }
         public async Task Save()

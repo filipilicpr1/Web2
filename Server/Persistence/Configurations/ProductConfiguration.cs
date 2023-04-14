@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Persistence.Configurations
 {
-    public class ArticleConfiguration : IEntityTypeConfiguration<Article>
+    public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
-        public void Configure(EntityTypeBuilder<Article> builder)
+        public void Configure(EntityTypeBuilder<Product> builder)
         {
             builder.HasKey(x => x.Id);
 
@@ -22,7 +22,7 @@ namespace Persistence.Configurations
             builder.Property(x => x.RowVersion).IsRowVersion();
 
             builder.HasOne(x => x.Seller)
-               .WithMany(x => x.Articles)
+               .WithMany(x => x.Products)
                .HasForeignKey(x => x.SellerId)
                .OnDelete(DeleteBehavior.NoAction);
         }

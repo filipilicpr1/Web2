@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Repositories
 {
-    public interface IArticleRepository : IGenericRepository<Article>
+    public interface IProductRepository : IGenericRepository<Product>
     {
     }
 }
