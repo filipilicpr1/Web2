@@ -64,5 +64,13 @@ namespace Presentation.Controllers
             DisplayProductDTO displayProductDTO = await _productService.UpdateProduct(id, User.Identity.Name, updateProductDTO);
             return Ok(displayProductDTO);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _productService.DeleteProduct(id, User.Identity.Name);
+            return NoContent();
+        }
     }
 }

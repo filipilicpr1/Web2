@@ -133,6 +133,23 @@ namespace Services
             return _mapper.Map<DisplayProductDTO>(product);
         }
 
+        public async Task DeleteProduct(Guid id, string sellerUsername)
+        {
+            Product product = await _unitOfWork.Products.GetDetailed(id);
+            if (product == null || product.IsDeleted)
+            {
+                throw new NotFoundException("Product with id " + id + " does not exist");
+            }
+
+            if (!String.Equals(product.Seller.Username, sellerUsername))
+            {
+                throw new BadRequestException("You can only delete your products");
+            }
+
+            product.IsDeleted = true;
+            await _unitOfWork.Save();
+        }
+
         private bool ValidateProductFields(string name, string  description, double price, int amount, out string message) 
         {
             message = "";
