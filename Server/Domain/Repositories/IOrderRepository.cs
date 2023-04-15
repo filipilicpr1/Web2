@@ -10,5 +10,7 @@ namespace Domain.Repositories
     public interface IOrderRepository : IGenericRepository<Order>
     {
         Task<Order> GetDetailed(Guid id);
+        Task<IEnumerable<Order>> GetNonDeliveredDetailedByBuyer(Guid id);
+        Task<IEnumerable<Order>> GetDeliveredDetailedByBuyer(Guid id);
     }
 }

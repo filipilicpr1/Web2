@@ -16,10 +16,37 @@ namespace Persistence.Repositories
 
         }
 
+        public async Task<IEnumerable<Order>> GetDeliveredDetailedByBuyer(Guid id)
+        {
+            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.Product)
+                                                               .Where(o => o.Buyer.Id == id &&
+                                                                           o.DeliveryTime < DateTime.Now &&
+                                                                           !o.IsCanceled)
+                                                               .OrderBy(o => o.OrderTime)
+                                                               .ToListAsync();
+            return orders;
+        }
+
         public async Task<Order> GetDetailed(Guid id)
         {
-            Order order = await _dbContext.Orders.Include(o => o.Buyer).Include(o => o.Product).Where(o => o.Id == id).FirstOrDefaultAsync();
+            Order order = await _dbContext.Orders.Include(o => o.Buyer)
+                                                 .Include(o => o.Product)
+                                                 .Where(o => o.Id == id)
+                                                 .FirstOrDefaultAsync();
             return order;
+        }
+
+        public async Task<IEnumerable<Order>> GetNonDeliveredDetailedByBuyer(Guid id)
+        {
+            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.Product)
+                                                               .Where(o => o.Buyer.Id == id &&
+                                                                           o.DeliveryTime > DateTime.Now &&
+                                                                           !o.IsCanceled)
+                                                               .OrderBy(o => o.DeliveryTime)
+                                                               .ToListAsync();
+            return orders;
         }
     }
 }

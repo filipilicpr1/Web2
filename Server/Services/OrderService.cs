@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Contracts.Common;
 using Contracts.OrderDTOs;
+using Contracts.ProductDTOs;
 using Domain.AppSettings;
 using Domain.Exceptions;
 using Domain.Models;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Services.Abstractions;
+using Services.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,6 +124,18 @@ namespace Services
             await _unitOfWork.Save();
 
             return _mapper.Map<DisplayOrderDTO>(order);
+        }
+
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredOrdersByBuyer(Guid id, int page)
+        {
+            IEnumerable<Order> orders = await _unitOfWork.Orders.GetNonDeliveredDetailedByBuyer(id);
+            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+        }
+
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrdersByBuyer(Guid id, int page)
+        {
+            IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredDetailedByBuyer(id);
+            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
         }
     }
 }

@@ -20,5 +20,6 @@ namespace Domain.AppSettings
         public string DefaultProductImageName { get; set; }
         public int UsersPageSize { get; set; }
         public int ProductsPageSize { get; set; }
+        public int OrdersPageSize { get; set; }
     }
 }

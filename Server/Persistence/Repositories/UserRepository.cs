@@ -33,6 +33,7 @@ namespace Persistence.Repositories
         {
             IEnumerable<User> users = await _dbContext.Users
                                                       .Where(user => user.UserType == UserTypes.SELLER && (!onlyVerified || user.VerificationStatus == VerificationStatuses.ACCEPTED))
+                                                      .OrderBy(user => user.Username)
                                                       .ToListAsync();
             return users;
         }

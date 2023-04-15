@@ -18,19 +18,27 @@ namespace Persistence.Repositories
 
         public async Task<IEnumerable<Product>> GetAllDetailed()
         {
-            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller).Where(p => !p.IsDeleted).ToListAsync();
+            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller)
+                                                                     .Where(p => !p.IsDeleted)
+                                                                     .OrderBy(p => p.Name)
+                                                                     .ToListAsync();
             return products;
         }
 
         public async Task<IEnumerable<Product>> GetAllDetailedBySeller(Guid id)
         {
-            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller).Where(p => !p.IsDeleted && p.Seller.Id == id).ToListAsync();
+            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller)
+                                                                     .Where(p => !p.IsDeleted && p.Seller.Id == id)
+                                                                     .OrderBy(p => p.Name)
+                                                                     .ToListAsync();
             return products;
         }
 
         public async Task<Product> GetDetailed(Guid id)
         {
-            Product product = await _dbContext.Products.Include(p => p.Seller).Where(p => p.Id == id).FirstOrDefaultAsync();
+            Product product = await _dbContext.Products.Include(p => p.Seller)
+                                                       .Where(p => p.Id == id)
+                                                       .FirstOrDefaultAsync();
             return product;
         }
     }

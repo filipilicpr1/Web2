@@ -1,4 +1,6 @@
-﻿using Contracts.OrderDTOs;
+﻿using Contracts.Common;
+using Contracts.OrderDTOs;
+using Contracts.ProductDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
@@ -43,6 +45,22 @@ namespace Presentation.Controllers
         {
             DisplayOrderDTO displayOrderDTO = await _orderService.CancelOrder(User.Identity.Name, id);
             return Ok(displayOrderDTO);
+        }
+
+        [HttpGet("buyer/{id}/in-progress")]
+        [Authorize(Roles = "buyer")]
+        public async Task<IActionResult> GetAllNonDeliveredByBuyer(Guid id, [FromQuery] int page)
+        {
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllNonDeliveredOrdersByBuyer(id, page);
+            return Ok(pagedOrders);
+        }
+
+        [HttpGet("buyer/{id}/delivered")]
+        [Authorize(Roles = "buyer")]
+        public async Task<IActionResult> GetAllDeliveredByBuyer(Guid id, [FromQuery] int page)
+        {
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDeliveredOrdersByBuyer(id, page);
+            return Ok(pagedOrders);
         }
     }
 }
