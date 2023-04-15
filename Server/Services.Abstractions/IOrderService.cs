@@ -11,5 +11,6 @@ namespace Services.Abstractions
     {
         Task<DisplayOrderDTO> CreateOrder(string buyerUsername, CreateOrderDTO createOrderDTO);
         Task<DisplayOrderDTO> GetById(Guid id);
+        Task<DisplayOrderDTO> CancelOrder(string buyerUsername, Guid id);
     }
 }

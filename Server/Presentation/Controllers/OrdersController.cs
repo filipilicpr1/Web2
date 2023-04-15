@@ -36,5 +36,13 @@ namespace Presentation.Controllers
             DisplayOrderDTO displayOrderDTO = await _orderService.CreateOrder(User.Identity.Name, createOrderDTO);
             return CreatedAtAction(nameof(Get), new { id = displayOrderDTO.Id }, displayOrderDTO);
         }
+
+        [HttpPut("{id}/cancel")]
+        [Authorize(Roles = "buyer")]
+        public async Task<IActionResult> CancelOrder(Guid id)
+        {
+            DisplayOrderDTO displayOrderDTO = await _orderService.CancelOrder(User.Identity.Name, id);
+            return Ok(displayOrderDTO);
+        }
     }
 }

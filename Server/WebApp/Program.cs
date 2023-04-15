@@ -1,5 +1,6 @@
 using AutoMapper;
 using Domain.AppSettings;
+using Domain.Random;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Persistence.Repositories;
 using Services;
 using Services.Abstractions;
 using Services.Mapping;
+using Services.Random;
 using System.Text;
 using WebApp.Middleware;
 
@@ -87,6 +89,7 @@ builder.Services.AddOptions();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddSingleton<IRandomService, RandomService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

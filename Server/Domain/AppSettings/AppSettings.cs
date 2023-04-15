@@ -12,6 +12,9 @@ namespace Domain.AppSettings
         public int MinPasswordLength { get; set; }
         public int MinBirthYear { get; set; }
         public double DeliveryFee { get; set; }
+        public int MinDeliveryTime { get; set; }
+        public int MaxDeliveryTime { get; set; }
+        public int CancelTime { get; set; }
         public string DefaultImagePath { get; set; }
         public string DefaultImageName { get; set; }
         public string DefaultProductImageName { get; set; }
