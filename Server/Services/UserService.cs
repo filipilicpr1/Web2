@@ -110,7 +110,7 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
-            registerUserDTO.ImageSource ??= Constants.DefaultImageName;
+            registerUserDTO.ImageSource ??= _settings.Value.DefaultImageName;
 
             bool usernameExists = await _unitOfWork.Users.FindByUsername(registerUserDTO.Username) != null;
             if(usernameExists) 
@@ -160,7 +160,7 @@ namespace Services
             }
 
             string currentImageName = user.ImageSource.Split('/').Last<string>();
-            if (!String.Equals(currentImageName, Constants.DefaultImageName) && updateUserDTO.Image != null)
+            if (!String.Equals(currentImageName, _settings.Value.DefaultImageName) && updateUserDTO.Image != null)
             {
                 ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
             }
@@ -229,13 +229,13 @@ namespace Services
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(false);
-            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, Constants.UsersPageSize, _mapper);
+            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, _settings.Value.UsersPageSize, _mapper);
         }
 
         public async Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page)
         {
             IEnumerable<User> users = await _unitOfWork.Users.GetSellers(true);
-            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, Constants.UsersPageSize, _mapper);
+            return PaginationHelper<User, DisplayUserDTO>.CreatePagedListDTO(users, page, _settings.Value.UsersPageSize, _mapper);
         }
 
         private bool ValidateUserFields(RegisterUserDTO registerUserDTO, out string message)
@@ -314,7 +314,7 @@ namespace Services
                 return false;
             }
 
-            if (password.Length < Constants.MinPasswordLength)
+            if (password.Length < _settings.Value.MinPasswordLength)
             {
                 message = "Password must have at least 4 characters";
                 return false;
@@ -345,7 +345,7 @@ namespace Services
                 return false;
             }
 
-            if (birthDate.Year < Constants.MinBirthYear || birthDate > DateTime.Now)
+            if (birthDate.Year < _settings.Value.MinBirthYear || birthDate > DateTime.Now)
             {
                 message = "Invalid birth date";
                 return false;

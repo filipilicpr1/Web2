@@ -11,10 +11,10 @@ namespace Services.Mapping
 {
     public class UserMappingProfile : Profile
     {
-        public UserMappingProfile()
+        public UserMappingProfile(string defaultImagePath)
         {
-            CreateMap<User, DisplayUserDTO>().ForMember(dest => dest.ImageSource, opt=>opt.MapFrom(src => Constants.DefaultImagePath + src.ImageSource)).ReverseMap();
-            CreateMap<User, RestrictedDisplayUserDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => Constants.DefaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<User, DisplayUserDTO>().ForMember(dest => dest.ImageSource, opt=>opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<User, RestrictedDisplayUserDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
             CreateMap<User, RegisterUserDTO>().ReverseMap();
         }
     }

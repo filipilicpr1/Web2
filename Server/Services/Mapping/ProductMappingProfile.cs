@@ -12,9 +12,9 @@ namespace Services.Mapping
 {
     public class ProductMappingProfile : Profile
     {
-        public ProductMappingProfile()
+        public ProductMappingProfile(string defaultImagePath)
         {
-            CreateMap<Product, DisplayProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => Constants.DefaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<Product, DisplayProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
             CreateMap<Product, CreateProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.Ignore()).ReverseMap();
         }
     }

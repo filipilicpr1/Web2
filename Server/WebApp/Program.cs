@@ -95,8 +95,8 @@ builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(
 
 var mapperConfig = new MapperConfiguration(mc =>
 {
-    mc.AddProfile(new UserMappingProfile());
-    mc.AddProfile(new ProductMappingProfile());
+    mc.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
+    mc.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
 });
 
 IMapper mapper = mapperConfig.CreateMapper();

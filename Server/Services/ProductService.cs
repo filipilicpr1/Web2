@@ -23,9 +23,11 @@ namespace Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IOptions<AppSettings> _settings;
         private readonly IHostEnvironment _hostEnvironment;
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment)
+        public ProductService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment)
         {
+            _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
@@ -72,7 +74,7 @@ namespace Services
             await _unitOfWork.Products.Add(product);
 
             product.ImageSource = createProductDTO.ImageSource == null ? 
-                                  Constants.DefaultProductImageName : 
+                                  _settings.Value.DefaultProductImageName : 
                                   await ImageHelper.SaveImage(createProductDTO.ImageSource, product.Id, _hostEnvironment.ContentRootPath);
             await _unitOfWork.Save();
             
@@ -81,13 +83,13 @@ namespace Services
         public async Task<PagedListDTO<DisplayProductDTO>> GetAll(int page)
         {
             IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailed();
-            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, Constants.ProductsPageSize, _mapper);
+            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
         }
 
         public async Task<PagedListDTO<DisplayProductDTO>> GetAllBySeller(Guid id, int page)
         {
             IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailedBySeller(id);
-            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, Constants.ProductsPageSize, _mapper);
+            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
         }
 
         public async Task<DisplayProductDTO> UpdateProduct(Guid id, string sellerUsername, UpdateProductDTO updateProductDTO)
@@ -115,7 +117,7 @@ namespace Services
             }
 
             string currentImageName = product.ImageSource.Split('/').Last<string>();
-            if (!String.Equals(currentImageName, Constants.DefaultProductImageName) && updateProductDTO.Image != null)
+            if (!String.Equals(currentImageName, _settings.Value.DefaultProductImageName) && updateProductDTO.Image != null)
             {
                 ImageHelper.DeleteImage(currentImageName, _hostEnvironment.ContentRootPath);
             }

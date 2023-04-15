@@ -9,5 +9,12 @@ namespace Domain.AppSettings
     public class AppSettings
     {
         public string SecretKey { get; set; }
+        public int MinPasswordLength { get; set; }
+        public int MinBirthYear { get; set; }
+        public string DefaultImagePath { get; set; }
+        public string DefaultImageName { get; set; }
+        public string DefaultProductImageName { get; set; }
+        public int UsersPageSize { get; set; }
+        public int ProductsPageSize { get; set; }
     }
 }
