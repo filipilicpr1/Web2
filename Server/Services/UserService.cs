@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SendGrid.Helpers.Mail;
+using SendGrid;
 using Services.Abstractions;
 using Services.Helpers;
 using System;
@@ -225,6 +227,7 @@ namespace Services
             user.IsVerified = isAccepted;
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
+            await SendEmail(user);
         }
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {
@@ -352,6 +355,19 @@ namespace Services
             }
 
             return true;
+        }
+
+        private async Task SendEmail(User user)
+        {
+            var client = new SendGridClient(_settings.Value.SendgridApi);
+            var senderEmail = new EmailAddress(_settings.Value.SendgridEmail, _settings.Value.SendgridName);
+            var receiverEmail = new EmailAddress(user.Email, user.Name);
+
+            string emailSubject = "Verification result";
+            string htmlContent = "<p>" + "Your request has been " + (user.IsVerified ? "accepted." : "denied.") + "</p>";
+
+            var msg = MailHelper.CreateSingleEmail(senderEmail, receiverEmail, emailSubject, "", htmlContent);
+            await client.SendEmailAsync(msg).ConfigureAwait(false);
         }
     }
 }

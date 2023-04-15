@@ -21,5 +21,8 @@ namespace Domain.AppSettings
         public int UsersPageSize { get; set; }
         public int ProductsPageSize { get; set; }
         public int OrdersPageSize { get; set; }
+        public string SendgridApi { get; set; }
+        public string SendgridEmail { get; set; }
+        public string SendgridName { get; set; }
     }
 }
