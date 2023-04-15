@@ -71,5 +71,14 @@ namespace Persistence.Repositories
                                                                .ToListAsync();
             return orders;
         }
+
+        public async Task<IEnumerable<Order>> GetAllDetailed()
+        {
+            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.Product)
+                                                               .OrderBy(o => o.OrderTime)
+                                                               .ToListAsync();
+            return orders;
+        }
     }
 }

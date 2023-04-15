@@ -17,5 +17,6 @@ namespace Services.Abstractions
         Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredByBuyer(Guid id, int page);
         Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredBySeller(Guid id, int page);
         Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrCanceledBySeller(Guid id, int page);
+        Task<PagedListDTO<DisplayOrderDTO>> GetAllDetailed(int page);
     }
 }

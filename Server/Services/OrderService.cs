@@ -8,6 +8,7 @@ using Domain.Models;
 using Domain.Random;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Services.Abstractions;
@@ -147,6 +148,12 @@ namespace Services
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrCanceledBySeller(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredOrCanceledDetailedBySeller(id);
+            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+        }
+
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDetailed(int page)
+        {
+            IEnumerable<Order> orders = await _unitOfWork.Orders.GetAllDetailed();
             return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
         }
     }

@@ -78,5 +78,13 @@ namespace Presentation.Controllers
             PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDeliveredOrCanceledBySeller(id, page);
             return Ok(pagedOrders);
         }
+
+        [HttpGet]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAll([FromQuery] int page)
+        {
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDetailed(page);
+            return Ok(pagedOrders);
+        }
     }
 }
