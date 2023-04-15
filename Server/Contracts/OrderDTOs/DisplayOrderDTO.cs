@@ -1,26 +1,25 @@
-﻿using Domain.Enums;
+﻿using Contracts.ProductDTOs;
+using Contracts.UserDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Models
+namespace Contracts.OrderDTOs
 {
-    public class Order
+    public class DisplayOrderDTO
     {
         public Guid Id { get; set; }
         public string Comment { get; set; }
         public string DeliveryAddress { get; set; }
-        public Guid ProductId { get; set; }
-        public Product Product { get; set; }
+        public DisplayProductDTO Product { get; set; }
         public int Amount { get; set; }
         public double Price { get; set; }
-        public Guid BuyerId { get; set; }
-        public User Buyer { get; set; }
+        public RestrictedDisplayUserDTO Buyer { get; set; }
         public DateTime OrderTime { get; set; }
         public DateTime DeliveryTime { get; set; }
         public bool IsCanceled { get; set; }
-        public byte[] RowVersion { get; set; }
+        public string Status { get; set; }
     }
 }

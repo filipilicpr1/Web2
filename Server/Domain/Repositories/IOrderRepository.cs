@@ -9,5 +9,6 @@ namespace Domain.Repositories
 {
     public interface IOrderRepository : IGenericRepository<Order>
     {
+        Task<Order> GetDetailed(Guid id);
     }
 }

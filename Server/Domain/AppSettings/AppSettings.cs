@@ -11,6 +11,7 @@ namespace Domain.AppSettings
         public string SecretKey { get; set; }
         public int MinPasswordLength { get; set; }
         public int MinBirthYear { get; set; }
+        public double DeliveryFee { get; set; }
         public string DefaultImagePath { get; set; }
         public string DefaultImageName { get; set; }
         public string DefaultProductImageName { get; set; }

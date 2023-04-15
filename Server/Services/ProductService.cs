@@ -56,10 +56,15 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
-            User seller = await _unitOfWork.Users.FindByUsername(sellerUsername);
+            User seller = await _unitOfWork.Users.Find(createProductDTO.SellerId);
             if(seller == null) 
             {
-                throw new BadRequestException("There is no seller with username " + sellerUsername);
+                throw new BadRequestException("Seller with id " + createProductDTO.SellerId + " does not exist");
+            }
+
+            if(!String.Equals(seller.Username, sellerUsername))
+            {
+                throw new BadRequestException("You can only add products for yourself");
             }
 
             if(seller.VerificationStatus != VerificationStatuses.ACCEPTED)
@@ -68,7 +73,6 @@ namespace Services
             }
 
             Product product = _mapper.Map<Product>(createProductDTO);
-            product.SellerId = seller.Id;
             product.Seller = seller;
             product.IsDeleted = false;
             await _unitOfWork.Products.Add(product);

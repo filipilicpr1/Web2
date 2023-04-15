@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.AppSettings;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -85,6 +86,7 @@ builder.Services.AddOptions();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -93,14 +95,12 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProjectDatabase"), b => b.MigrationsAssembly("WebApp")));
 
-var mapperConfig = new MapperConfiguration(mc =>
+builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
-    mc.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-    mc.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-});
-
-IMapper mapper = mapperConfig.CreateMapper();
-builder.Services.AddSingleton(mapper);
+    cfg.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
+    cfg.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
+    cfg.AddProfile(new OrderMappingProfile());
+}).CreateMapper());
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 

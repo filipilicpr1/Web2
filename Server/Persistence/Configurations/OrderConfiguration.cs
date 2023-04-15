@@ -22,12 +22,6 @@ namespace Persistence.Configurations
 
             builder.Property(x => x.RowVersion).IsRowVersion();
 
-            builder.Property(x => x.Status)
-                   .HasConversion(
-                       x => x.ToString(),
-                       x => Enum.Parse<OrderStatuses>(x)
-                   );
-
             builder.HasOne(x => x.Buyer)
                .WithMany(x => x.Orders)
                .HasForeignKey(x => x.BuyerId)
