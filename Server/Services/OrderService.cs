@@ -126,15 +126,27 @@ namespace Services
             return _mapper.Map<DisplayOrderDTO>(order);
         }
 
-        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredOrdersByBuyer(Guid id, int page)
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredByBuyer(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetNonDeliveredDetailedByBuyer(id);
             return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
         }
 
-        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrdersByBuyer(Guid id, int page)
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredByBuyer(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredDetailedByBuyer(id);
+            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+        }
+
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredBySeller(Guid id, int page)
+        {
+            IEnumerable<Order> orders = await _unitOfWork.Orders.GetNonDeliveredDetailedBySeller(id);
+            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+        }
+
+        public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrCanceledBySeller(Guid id, int page)
+        {
+            IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredOrCanceledDetailedBySeller(id);
             return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
         }
     }

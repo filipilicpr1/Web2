@@ -13,7 +13,9 @@ namespace Services.Abstractions
         Task<DisplayOrderDTO> CreateOrder(string buyerUsername, CreateOrderDTO createOrderDTO);
         Task<DisplayOrderDTO> GetById(Guid id);
         Task<DisplayOrderDTO> CancelOrder(string buyerUsername, Guid id);
-        Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredOrdersByBuyer(Guid id, int page);
-        Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrdersByBuyer(Guid id, int page);
+        Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredByBuyer(Guid id, int page);
+        Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredByBuyer(Guid id, int page);
+        Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredBySeller(Guid id, int page);
+        Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrCanceledBySeller(Guid id, int page);
     }
 }

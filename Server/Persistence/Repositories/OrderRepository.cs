@@ -16,6 +16,17 @@ namespace Persistence.Repositories
 
         }
 
+        public async Task<IEnumerable<Order>> GetDeliveredOrCanceledDetailedBySeller(Guid id)
+        {
+            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.Product)
+                                                               .Where(o => o.Product.SellerId == id &&
+                                                                           o.DeliveryTime < DateTime.Now)
+                                                               .OrderBy(o => o.OrderTime)
+                                                               .ToListAsync();
+            return orders;
+        }
+
         public async Task<IEnumerable<Order>> GetDeliveredDetailedByBuyer(Guid id)
         {
             IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
@@ -42,6 +53,18 @@ namespace Persistence.Repositories
             IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
                                                                .Include(o => o.Product)
                                                                .Where(o => o.Buyer.Id == id &&
+                                                                           o.DeliveryTime > DateTime.Now &&
+                                                                           !o.IsCanceled)
+                                                               .OrderBy(o => o.DeliveryTime)
+                                                               .ToListAsync();
+            return orders;
+        }
+
+        public async Task<IEnumerable<Order>> GetNonDeliveredDetailedBySeller(Guid id)
+        {
+            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.Product)
+                                                               .Where(o => o.Product.SellerId == id &&
                                                                            o.DeliveryTime > DateTime.Now &&
                                                                            !o.IsCanceled)
                                                                .OrderBy(o => o.DeliveryTime)

@@ -12,5 +12,7 @@ namespace Domain.Repositories
         Task<Order> GetDetailed(Guid id);
         Task<IEnumerable<Order>> GetNonDeliveredDetailedByBuyer(Guid id);
         Task<IEnumerable<Order>> GetDeliveredDetailedByBuyer(Guid id);
+        Task<IEnumerable<Order>> GetNonDeliveredDetailedBySeller(Guid id);
+        Task<IEnumerable<Order>> GetDeliveredOrCanceledDetailedBySeller(Guid id);
     }
 }

@@ -51,7 +51,7 @@ namespace Presentation.Controllers
         [Authorize(Roles = "buyer")]
         public async Task<IActionResult> GetAllNonDeliveredByBuyer(Guid id, [FromQuery] int page)
         {
-            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllNonDeliveredOrdersByBuyer(id, page);
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllNonDeliveredByBuyer(id, page);
             return Ok(pagedOrders);
         }
 
@@ -59,7 +59,23 @@ namespace Presentation.Controllers
         [Authorize(Roles = "buyer")]
         public async Task<IActionResult> GetAllDeliveredByBuyer(Guid id, [FromQuery] int page)
         {
-            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDeliveredOrdersByBuyer(id, page);
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDeliveredByBuyer(id, page);
+            return Ok(pagedOrders);
+        }
+
+        [HttpGet("seller/{id}/in-progress")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> GetAllNonDeliveredBySeller(Guid id, [FromQuery] int page)
+        {
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllNonDeliveredBySeller(id, page);
+            return Ok(pagedOrders);
+        }
+
+        [HttpGet("seller/{id}/delivered-or-canceled")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> GetAllDeliveredOrCanceledBySeller(Guid id, [FromQuery] int page)
+        {
+            PagedListDTO<DisplayOrderDTO> pagedOrders = await _orderService.GetAllDeliveredOrCanceledBySeller(id, page);
             return Ok(pagedOrders);
         }
     }
