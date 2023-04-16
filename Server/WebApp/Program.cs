@@ -113,7 +113,7 @@ using (var scope = app.Services.CreateScope())
 {
     // apply new migrations on startup
     var context = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
-    context.Database.MigrateAsync();
+    context.Database.EnsureCreated();
 }
 
 // Configure the HTTP request pipeline.
