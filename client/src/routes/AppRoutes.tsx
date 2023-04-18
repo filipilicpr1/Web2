@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import LoginLayout from "../layouts/LoginLayout";
+import AppLayout from "../layouts/AppLayout";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -20,7 +21,7 @@ const AppRoutes: FC = () => {
           </Route>
         )}
         {isLoggedIn && (
-          <Route>  
+          <Route element={<AppLayout />}>  
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<Navigate replace to={"/"} />} />
           </Route>
