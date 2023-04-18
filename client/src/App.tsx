@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import SuspenseFallback from "./components/Suspense/SuspenseFallback";
 import AppRoutes from "./routes/AppRoutes";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from "./styles/theme";
@@ -7,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-    <Suspense fallback={<div>Loading</div>}>
+    <Suspense fallback={<SuspenseFallback />}>
       <ThemeProvider theme={theme}>
         <AppRoutes />
         <ToastContainer theme="dark"/>
