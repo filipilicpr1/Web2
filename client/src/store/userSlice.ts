@@ -52,6 +52,13 @@ const userSlice = createSlice({
       state.isLoggedIn = true;
       localStorage.setItem("token", action.payload);
     },
+    logout(state) {
+      state.token = null;
+      state.isLoggedIn = false;
+      state.user = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(loginAction.pending, (state) => {
@@ -110,5 +117,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { receivedToken } = userSlice.actions;
+export const { receivedToken, logout } = userSlice.actions;
 export default userSlice.reducer;

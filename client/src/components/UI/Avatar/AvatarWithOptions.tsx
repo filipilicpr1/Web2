@@ -8,9 +8,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
-import { useAppSelector } from "../../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../../store/hooks";
+import { logout } from "../../../store/userSlice";
 
 const AvatarWithOptions: FC = () => {
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user.user);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -20,6 +22,11 @@ const AvatarWithOptions: FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const logoutHandler = () => {
+    dispatch(logout());
+    setAnchorEl(null);
+  }
   return (
     <>
       <Tooltip title={"Settings"}>
@@ -79,7 +86,7 @@ const AvatarWithOptions: FC = () => {
           </ListItemIcon>
           Change Password
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={logoutHandler}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
