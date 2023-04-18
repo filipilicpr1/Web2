@@ -1,16 +1,16 @@
-﻿using Domain.Random;
+﻿using Domain.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Random
+namespace Services.Utilities
 {
-    public class RandomService : IRandomService
+    public class RandomUtility : IRandomUtility
     {
         private System.Random random;
-        public RandomService() 
+        public RandomUtility() 
         {
             random = new System.Random();
         }

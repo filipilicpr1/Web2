@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Random
+namespace Domain.Utilities
 {
-    public interface IRandomService
+    public interface IRandomUtility
     {
         int GetRandomNumberInRange(int lowerLimit, int upperLimit);
     }

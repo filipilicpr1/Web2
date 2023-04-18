@@ -5,7 +5,7 @@ using Contracts.ProductDTOs;
 using Domain.AppSettings;
 using Domain.Exceptions;
 using Domain.Models;
-using Domain.Random;
+using Domain.Utilities;
 using Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -26,13 +26,13 @@ namespace Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IOptions<AppSettings> _settings;
-        private readonly IRandomService _randomService;
-        public OrderService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IRandomService randomService)
+        private readonly IRandomUtility _randomUtility;
+        public OrderService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IRandomUtility randomUtility)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _randomService = randomService;
+            _randomUtility = randomUtility;
         }
 
         public async Task<DisplayOrderDTO> GetById(Guid id)
@@ -88,7 +88,7 @@ namespace Services
             order.Price = order.Amount * order.Product.Price + _settings.Value.DeliveryFee;
             product.Amount -= order.Amount;
             order.OrderTime = DateTime.Now;
-            order.DeliveryTime = order.OrderTime.AddMinutes(_randomService.GetRandomNumberInRange(_settings.Value.MinDeliveryTime, _settings.Value.MaxDeliveryTime));
+            order.DeliveryTime = order.OrderTime.AddMinutes(_randomUtility.GetRandomNumberInRange(_settings.Value.MinDeliveryTime, _settings.Value.MaxDeliveryTime));
             order.IsCanceled = false;
 
             await _unitOfWork.Orders.Add(order);

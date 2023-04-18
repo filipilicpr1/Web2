@@ -26,6 +26,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
+using Domain.Utilities;
 
 namespace Services
 {
@@ -35,12 +36,14 @@ namespace Services
         private readonly IMapper _mapper;
         private readonly IOptions<AppSettings> _settings;
         private readonly IHostEnvironment _hostEnvironment;
-        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment)
+        private readonly IEmailUtility _emailUtility;
+        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, IEmailUtility emailUtility)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
+            _emailUtility = emailUtility;
         }
         public async Task<DisplayUserDTO> GetById(Guid id)
         {
@@ -227,7 +230,7 @@ namespace Services
             user.IsVerified = isAccepted;
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
-            await SendEmail(user);
+            await _emailUtility.SendEmail(user.Email, user.Name, user.IsVerified);
         }
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {
@@ -355,19 +358,6 @@ namespace Services
             }
 
             return true;
-        }
-
-        private async Task SendEmail(User user)
-        {
-            var client = new SendGridClient(_settings.Value.SendgridApi);
-            var senderEmail = new EmailAddress(_settings.Value.SendgridEmail, _settings.Value.SendgridName);
-            var receiverEmail = new EmailAddress(user.Email, user.Name);
-
-            string emailSubject = "Verification result";
-            string htmlContent = "<p>" + "Your request has been " + (user.IsVerified ? "accepted." : "denied.") + "</p>";
-
-            var msg = MailHelper.CreateSingleEmail(senderEmail, receiverEmail, emailSubject, "", htmlContent);
-            await client.SendEmailAsync(msg).ConfigureAwait(false);
         }
     }
 }
