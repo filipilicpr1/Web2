@@ -10,8 +10,10 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { logout } from "../../../store/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const AvatarWithOptions: FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user.user);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -22,6 +24,11 @@ const AvatarWithOptions: FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const profileClickHandler = () => {
+    navigate("/profile");
+    setAnchorEl(null);
+  }
 
   const logoutHandler = () => {
     dispatch(logout());
@@ -76,7 +83,7 @@ const AvatarWithOptions: FC = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={profileClickHandler}>
           <Avatar /> Profile
         </MenuItem>
         <Divider />
