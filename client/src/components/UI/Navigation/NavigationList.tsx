@@ -10,6 +10,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import List from "@mui/material/List";
 import { useAppSelector } from "../../../store/hooks";
 import { IUser } from "../../../shared/interfaces/userInterfaces";
@@ -36,6 +37,7 @@ function generateItemsForUser(user: IUser): IItem[] | null {
 
   if (user.userType === "SELLER") {
     items.push({ name: "New product", index: index++ });
+    items.push({ name: "My products", index: index++ });
     items.push({ name: "New orders", index: index++ });
     items.push({ name: "My orders", index: index++ });
     return items;
@@ -55,6 +57,7 @@ icons.set("Products", <StorefrontIcon />);
 icons.set("Active orders", <AccessTimeIcon />);
 icons.set("History", <ReceiptLongIcon />);
 icons.set("New product", <QueueIcon />);
+icons.set("My products", <LibraryBooksIcon />);
 icons.set("New orders", <LocalMallIcon />);
 icons.set("My orders", <InventoryIcon />);
 icons.set("Verification", <VerifiedIcon />);

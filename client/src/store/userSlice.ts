@@ -136,6 +136,13 @@ const userSlice = createSlice({
         state.apiState = "COMPLETED";
         state.user = {...action.payload};
         localStorage.setItem('user', JSON.stringify(action.payload));
+
+        toast.success("Your info has been updated", {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
       }
     );
     builder.addCase(updateUserAction.rejected, (state, action) => {
