@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Login, GetUserById } from "../services/UserService";
-import { IUser, IUserLogin, IAuth } from "../shared/interfaces/userInterfaces";
+import { Login, GetUserById, UpdateUser } from "../services/UserService";
+import { IUser, IUserLogin, IAuth, IUserUpdate } from "../shared/interfaces/userInterfaces";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
 import { defaultErrorMessage } from "../constants/Constants";
@@ -36,6 +36,18 @@ export const getUserByIdAction = createAsyncThunk(
   async (id: string, thunkApi) => {
     try {
       const response = await GetUserById(id);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+export const updateUserAction = createAsyncThunk(
+  "user/update",
+  async (data: IUserUpdate , thunkApi) => {
+    try {
+      const response = await UpdateUser(data.id, data.data);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -101,6 +113,32 @@ const userSlice = createSlice({
       }
     );
     builder.addCase(getUserByIdAction.rejected, (state, action) => {
+      state.apiState = "COMPLETED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(updateUserAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      updateUserAction.fulfilled,
+      (state, action: PayloadAction<IUser>) => {
+        state.apiState = "COMPLETED";
+        state.user = {...action.payload};
+        localStorage.setItem('user', JSON.stringify(action.payload));
+      }
+    );
+    builder.addCase(updateUserAction.rejected, (state, action) => {
       state.apiState = "COMPLETED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {

@@ -19,6 +19,11 @@ export interface IUserLogin {
     password: string
 }
 
+export interface IUserUpdate {
+    id: string,
+    data: FormData
+}
+
 export interface IAuth {
     token: string
 }

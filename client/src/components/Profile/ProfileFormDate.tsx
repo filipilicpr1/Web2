@@ -1,20 +1,17 @@
-import React, { FC, useState, useRef } from "react";
-import { TextField, Grid, Box, InputLabel } from "@mui/material";
+import React, { FC } from "react";
+import { Grid, Box, InputLabel } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { deDE } from '@mui/x-date-pickers/locales';
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns"
 
 interface IProps {
   id: string;
   label: string;
-  initialValue: string;
+  initialValue: string | undefined;
   setValue: (value: Date | null) => void
 }
 
 const ProfileFormDate: FC<IProps> = (props) => {
-  const date = useRef();
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {};
 
   return (
     <Grid
@@ -47,9 +44,10 @@ const ProfileFormDate: FC<IProps> = (props) => {
       <Box mr={-30} mt={2} width={800}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DesktopDatePicker
-            defaultValue={new Date(props.initialValue)}
+            defaultValue={new Date(props.initialValue || new Date())}
             format="dd/MM/yyyy"
             onChange={(newValue) => props.setValue(newValue)}
+            sx={{ width: 290}}
           />
         </LocalizationProvider>
       </Box>

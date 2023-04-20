@@ -1,78 +1,63 @@
-import React, { FC, useState } from "react";
-import {
-  Button,
-  CssBaseline,
-  TextField,
-  Grid,
-  Box,
-  Typography,
-  Container,
-  InputLabel,
-  Card,
-} from "@mui/material";
+import React, { FC, useState, useRef } from "react";
+import { Button, Grid, Card } from "@mui/material";
 import ProfileFormItem from "./ProfileFormItem";
 import ProfileFormDate from "./ProfileFormDate";
-
-interface IProps {
-  children?: React.ReactNode;
-}
-
-const BorderedBox: FC<IProps> = (props) => {
-  return (
-    <Box
-      sx={{
-        borderRadius: "20px",
-        border: "1px solid white",
-        padding: "2rem",
-        margin: "1rem",
-      }}
-    >
-      {props.children}
-    </Box>
-  );
-};
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { updateUserAction } from "../../store/userSlice";
+import ProfileImagePicker from "./ProfileImagePicker";
 
 const ProfileForm: FC = () => {
-  const title = (
-    <Box
-      mb={2}
-      sx={{
-        borderRadius: "20px",
-        border: "1px solid white",
-        padding: "2rem",
-        boxShadow: "5px 3px 3px",
-        textAlign: "center",
-        ml: 40,
-        mr: 40,
-      }}
-    >
-      <Typography component="h2" variant="h2">
-        My Profile
-      </Typography>
-    </Box>
-  );
-
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.user);
   const [date, setDate] = useState<Date | null>(new Date("1998-12-18"));
+  const imagePicker = useRef<HTMLInputElement>(null);
+  const [image, setImage] = useState(user?.imageSource);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
 
   const dateChangeHandler = (value: Date | null) => {
     setDate(value);
-  }
+  };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    if (user === null) {
+      return;
+    }
+    
     const data = new FormData(event.currentTarget);
-    const name = data.get("name");
-    const address = data.get("address");
-    console.log(name);
-    console.log(address);
-    console.log(date);
+    if (date !== null) {
+      data.append("birthDate", date.toISOString());
+    }
+    if (uploadedImage !== null) {
+      data.append("image", uploadedImage);
+    }
+
+    dispatch(updateUserAction({id: user.id, data: data}));
+  };
+
+  const imageUploadHandler = () => {
+    if (!imagePicker.current) {
+      return;
+    }
+    (imagePicker.current.children[0] as HTMLInputElement).click();
+  };
+
+  const imageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) {
+      return;
+    }
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    if (file) {
+      setUploadedImage(file);
+      reader.readAsDataURL(file);
+      reader.onloadend = function (e) {
+        setImage(reader.result?.toString());
+      };
+    }
   };
 
   return (
-    <Container component="main">
-      <CssBaseline />
-      <Box sx={{ width: "1430px", marginLeft: "-10rem" }}>{title}</Box>
       <Grid component="form" container onSubmit={handleSubmit}>
         <Grid item xs={6}>
           <Card
@@ -84,20 +69,27 @@ const ProfileForm: FC = () => {
               marginLeft: "-8rem",
               borderRadius: "20px",
               bgcolor: "primary",
+              boxShadow:
+                "rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px",
             }}
           >
-            <ProfileFormItem id="name" label="Name" initialValue="Filip" />
+            <ProfileFormItem id="name" label="Name" initialValue={user?.name} />
             <ProfileFormItem
               id="lastName"
               label="Last Name"
-              initialValue="Ilic"
+              initialValue={user?.lastName}
             />
             <ProfileFormItem
               id="address"
               label="Address"
-              initialValue="Kostanina 30"
+              initialValue={user?.address}
             />
-            <ProfileFormDate id="date" label="Date" initialValue="1998-12-18" setValue={dateChangeHandler} />
+            <ProfileFormDate
+              id="date"
+              label="Date"
+              initialValue={user?.birthDate}
+              setValue={dateChangeHandler}
+            />
           </Card>
         </Grid>
         <Grid item xs={6}>
@@ -108,21 +100,50 @@ const ProfileForm: FC = () => {
               marginRight: "-8rem",
               borderRadius: "20px",
               bgcolor: "primary",
+              display: "flex",
+              flexDirection: "column",
+              alignContent: "center",
+              textAlign: "center",
+              justifyContent: "center",
+              height: 330,
+              boxShadow:
+                "rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px",
             }}
           >
-            <BorderedBox></BorderedBox>
+            <ProfileImagePicker
+              image={image}
+              imagePicker={imagePicker}
+              uploadHandler={imageChangeHandler}
+              avatarClickHandler={imageUploadHandler}
+            />
           </Card>
         </Grid>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}
         >
-          Sign In
-        </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              mt: 6,
+              mb: 2,
+              mr: -15,
+              bgcolor: "green",
+              alignSelf: "flex-end",
+              width: 120,
+              height: 40,
+            }}
+          >
+            Save
+          </Button>
+        </Grid>
       </Grid>
-    </Container>
   );
 };
 

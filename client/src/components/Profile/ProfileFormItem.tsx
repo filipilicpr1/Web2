@@ -4,7 +4,7 @@ import { TextField, Grid, Box, InputLabel } from "@mui/material";
 interface IProps {
   id: string;
   label: string;
-  initialValue: string;
+  initialValue: string | undefined;
 }
 
 const ProfileFormItem: FC<IProps> = (props) => {
