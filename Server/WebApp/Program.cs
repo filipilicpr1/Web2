@@ -96,6 +96,7 @@ builder.Services.AddScoped<IEmailUtility, EmailUtility>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProjectDatabase"), b => b.MigrationsAssembly("WebApp")));
@@ -104,7 +105,7 @@ builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
     cfg.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-    cfg.AddProfile(new OrderMappingProfile());
+    cfg.AddProfile(new OrderMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
 }).CreateMapper());
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();

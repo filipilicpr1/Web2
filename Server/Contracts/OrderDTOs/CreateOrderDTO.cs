@@ -10,8 +10,7 @@ namespace Contracts.OrderDTOs
     {
         public string Comment { get; set; }
         public string DeliveryAddress { get; set; }
-        public int Amount { get; set; }
-        public Guid ProductId { get; set; }
+        public IEnumerable<CreateOrderProductDTO> OrderProducts { get; set; }
         public Guid BuyerId { get; set; }
     }
 }

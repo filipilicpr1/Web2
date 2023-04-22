@@ -12,15 +12,13 @@ namespace Domain.Models
         public Guid Id { get; set; }
         public string Comment { get; set; }
         public string DeliveryAddress { get; set; }
-        public Guid ProductId { get; set; }
-        public Product Product { get; set; }
-        public int Amount { get; set; }
         public double Price { get; set; }
-        public Guid BuyerId { get; set; }
-        public User Buyer { get; set; }
         public DateTime OrderTime { get; set; }
         public DateTime DeliveryTime { get; set; }
         public bool IsCanceled { get; set; }
+        public Guid BuyerId { get; set; }
+        public User Buyer { get; set; }
+        public List<OrderProduct> OrderProducts { get; set; }
         public byte[] RowVersion { get; set; }
     }
 }

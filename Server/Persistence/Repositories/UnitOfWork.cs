@@ -13,16 +13,19 @@ namespace Persistence.Repositories
         public IUserRepository Users { get; }
         public IProductRepository Products { get; }
         public IOrderRepository Orders { get; }
+        public IOrderProductRepository OrderProducts { get; }
 
         public UnitOfWork(ProjectDbContext dbContext,
                           IUserRepository users,
                           IProductRepository products,
-                          IOrderRepository orders)
+                          IOrderRepository orders,
+                          IOrderProductRepository orderPrdocuts)
         {
             _dbContext = dbContext;
             Users = users;
             Products = products;
             Orders = orders;
+            OrderProducts = orderPrdocuts;
         }
         public async Task Save()
         {

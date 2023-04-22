@@ -55,11 +55,6 @@ namespace Services
                 throw new BadRequestException("Delivery address cannot be empty");
             }
 
-            if(createOrderDTO.Amount <= 0)
-            {
-                throw new BadRequestException("Amount must be > 0");
-            }
-
             User buyer = await _unitOfWork.Users.Find(createOrderDTO.BuyerId);
             if(buyer == null) 
             {
@@ -71,29 +66,49 @@ namespace Services
                 throw new BadRequestException("You can only make orders for yourself");
             }
 
-            Product product = await _unitOfWork.Products.Find(createOrderDTO.ProductId);
-            if(product == null || product.IsDeleted)
+            if(createOrderDTO.OrderProducts == null || createOrderDTO.OrderProducts.Count() == 0) 
             {
-                throw new BadRequestException("Product with id " + createOrderDTO.ProductId + " does not exist");
-            }
-
-            if(product.Amount < createOrderDTO.Amount)
-            {
-                throw new BadRequestException("There are no " + createOrderDTO.Amount + " products with name " + product.Name + " remaining, " + product.Amount + " left");
+                throw new BadRequestException("Order must have at least 1 product");
             }
 
             Order order = _mapper.Map<Order>(createOrderDTO);
-            order.Buyer = buyer;
-            order.Product = product;
-            order.Price = order.Amount * order.Product.Price + _settings.Value.DeliveryFee;
-            product.Amount -= order.Amount;
+            order.Buyer = buyer; 
+            order.IsCanceled = false;
+            await _unitOfWork.Orders.Add(order);
+
+            double price = 0;
+            foreach (CreateOrderProductDTO createOrderProductDTO in createOrderDTO.OrderProducts)
+            {
+                Product product = await _unitOfWork.Products.Find(createOrderProductDTO.ProductId);
+
+                if(product == null || product.IsDeleted) 
+                {
+                    throw new BadRequestException("Id " + createOrderProductDTO.ProductId + " is not a valid product id");
+                }
+
+                if(product.Amount < createOrderProductDTO.Amount)
+                {
+                    throw new BadRequestException("There are not " + createOrderProductDTO.Amount + " products with id " + product.Id + ", " + product.Amount + " remaining");
+                }
+
+                OrderProduct orderProduct = new OrderProduct()
+                {
+                    ProductId = createOrderProductDTO.ProductId,
+                    OrderId =  order.Id,
+                    Amount = createOrderProductDTO.Amount
+                };
+
+                await _unitOfWork.OrderProducts.Add(orderProduct);
+                product.Amount -= createOrderProductDTO.Amount;
+                price += product.Price * orderProduct.Amount;
+            }
+
             order.OrderTime = DateTime.Now;
             order.DeliveryTime = order.OrderTime.AddMinutes(_randomUtility.GetRandomNumberInRange(_settings.Value.MinDeliveryTime, _settings.Value.MaxDeliveryTime));
-            order.IsCanceled = false;
+            order.Price = price + _settings.Value.DeliveryFee;
 
-            await _unitOfWork.Orders.Add(order);
             await _unitOfWork.Save();
-            return _mapper.Map<DisplayOrderDTO>(order);
+            return _mapper.Map<DisplayOrderDTO>(await _unitOfWork.Orders.GetDetailed(order.Id));
         }
 
         public async Task<DisplayOrderDTO> CancelOrder(string buyerUsername, Guid id)
@@ -119,9 +134,11 @@ namespace Services
                 throw new BadRequestException("It is too late to cancel order with id " + id);
             }
 
-            Product product = await _unitOfWork.Products.Find(order.ProductId);
             order.IsCanceled = true;
-            product.Amount += order.Amount;
+            foreach(OrderProduct orderProduct in order.OrderProducts)
+            {
+                orderProduct.Product.Amount += orderProduct.Amount;
+            }
             await _unitOfWork.Save();
 
             return _mapper.Map<DisplayOrderDTO>(order);

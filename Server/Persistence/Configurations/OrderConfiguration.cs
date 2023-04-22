@@ -26,11 +26,6 @@ namespace Persistence.Configurations
                .WithMany(x => x.Orders)
                .HasForeignKey(x => x.BuyerId)
                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasOne(x => x.Product)
-               .WithMany(x => x.Orders)
-               .HasForeignKey(x => x.ProductId)
-               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

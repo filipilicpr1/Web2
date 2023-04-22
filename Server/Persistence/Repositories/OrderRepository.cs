@@ -18,19 +18,22 @@ namespace Persistence.Repositories
 
         public async Task<IEnumerable<Order>> GetDeliveredOrCanceledDetailedBySeller(Guid id)
         {
-            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
-                                                               .Include(o => o.Product)
-                                                               .Where(o => o.Product.SellerId == id &&
-                                                                           o.DeliveryTime < DateTime.Now)
+            List<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.OrderProducts)
+                                                               .ThenInclude(op => op.Product)
+                                                               .ThenInclude(p => p.Seller)
+                                                               .Where(o => o.DeliveryTime < DateTime.Now)
                                                                .OrderBy(o => o.OrderTime)
                                                                .ToListAsync();
-            return orders;
+            return orders.FindAll(o => o.OrderProducts.FindAll(op => op.Product.SellerId == id).Count != 0);
         }
 
         public async Task<IEnumerable<Order>> GetDeliveredDetailedByBuyer(Guid id)
         {
             IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
-                                                               .Include(o => o.Product)
+                                                               .Include(o => o.OrderProducts)
+                                                               .ThenInclude(op => op.Product)
+                                                               .ThenInclude(p => p.Seller)
                                                                .Where(o => o.Buyer.Id == id &&
                                                                            o.DeliveryTime < DateTime.Now &&
                                                                            !o.IsCanceled)
@@ -42,7 +45,9 @@ namespace Persistence.Repositories
         public async Task<Order> GetDetailed(Guid id)
         {
             Order order = await _dbContext.Orders.Include(o => o.Buyer)
-                                                 .Include(o => o.Product)
+                                                 .Include(o => o.OrderProducts)
+                                                 .ThenInclude(o => o.Product)
+                                                 .ThenInclude(p => p.Seller)
                                                  .Where(o => o.Id == id)
                                                  .FirstOrDefaultAsync();
             return order;
@@ -51,7 +56,9 @@ namespace Persistence.Repositories
         public async Task<IEnumerable<Order>> GetNonDeliveredDetailedByBuyer(Guid id)
         {
             IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
-                                                               .Include(o => o.Product)
+                                                               .Include(o => o.OrderProducts)
+                                                               .ThenInclude(op => op.Product)
+                                                               .ThenInclude(p => p.Seller)
                                                                .Where(o => o.Buyer.Id == id &&
                                                                            o.DeliveryTime > DateTime.Now &&
                                                                            !o.IsCanceled)
@@ -60,22 +67,25 @@ namespace Persistence.Repositories
             return orders;
         }
 
-        public async Task<IEnumerable<Order>> GetNonDeliveredDetailedBySeller(Guid id)
+        public async  Task<IEnumerable<Order>> GetNonDeliveredDetailedBySeller(Guid id)
         {
-            IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
-                                                               .Include(o => o.Product)
-                                                               .Where(o => o.Product.SellerId == id &&
-                                                                           o.DeliveryTime > DateTime.Now &&
+            List<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
+                                                               .Include(o => o.OrderProducts)
+                                                               .ThenInclude(op => op.Product)
+                                                               .ThenInclude(p => p.Seller)
+                                                               .Where(o => o.DeliveryTime > DateTime.Now &&
                                                                            !o.IsCanceled)
                                                                .OrderBy(o => o.DeliveryTime)
                                                                .ToListAsync();
-            return orders;
+            return orders.FindAll(o => o.OrderProducts.FindAll(op => op.Product.SellerId == id).Count != 0);
         }
 
         public async Task<IEnumerable<Order>> GetAllDetailed()
         {
             IEnumerable<Order> orders = await _dbContext.Orders.Include(o => o.Buyer)
-                                                               .Include(o => o.Product)
+                                                               .Include(o => o.OrderProducts)
+                                                               .ThenInclude(op => op.Product)
+                                                               .ThenInclude(p => p.Seller)
                                                                .OrderBy(o => o.OrderTime)
                                                                .ToListAsync();
             return orders;
