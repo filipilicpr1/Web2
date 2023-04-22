@@ -19,5 +19,6 @@ namespace Services.Abstractions
         Task VerifyUser(Guid id, bool isAccepted);
         Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page);
         Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page);
+        Task<AuthDTO> GoogleLogin(GoogleLoginDTO googleLoginDTO);
     }
 }

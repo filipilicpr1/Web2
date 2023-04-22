@@ -27,6 +27,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 using Domain.Utilities;
+using Google.Apis.Auth;
+using Newtonsoft.Json.Linq;
+using Google.Apis.Auth.OAuth2;
 
 namespace Services
 {
@@ -37,14 +40,17 @@ namespace Services
         private readonly IOptions<AppSettings> _settings;
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IEmailUtility _emailUtility;
-        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, IEmailUtility emailUtility)
+        private readonly ITokenUtility _tokenUtility;
+        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, IEmailUtility emailUtility, ITokenUtility tokenUtility)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
             _emailUtility = emailUtility;
+            _tokenUtility = tokenUtility;
         }
+
         public async Task<DisplayUserDTO> GetById(Guid id)
         {
             User user = await _unitOfWork.Users.Find(id);
@@ -83,27 +89,10 @@ namespace Services
                 throw new BadRequestException("Incorrect password");
             }
 
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Role, user.UserType.ToString().ToLower()));
-            claims.Add(new Claim(ClaimTypes.Name, user.Username));
-            claims.Add(new Claim("id", user.Id.ToString()));
-
-            var signinCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey)),
-                SecurityAlgorithms.HmacSha256);
-
-            var tokeOptions = new JwtSecurityToken(
-                issuer: "http://localhost:7126",
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(1000),
-                signingCredentials: signinCredentials
-            );
-
-            AuthDTO authDTO = new AuthDTO()
+            return new AuthDTO()
             {
-                Token = new JwtSecurityTokenHandler().WriteToken(tokeOptions)
+                Token = _tokenUtility.CreateToken(user.Id, user.Username, user.UserType, _settings.Value.SecretKey, _settings.Value.TokenIssuer, _settings.Value.TokenDuration)
             };
-            return authDTO;
         }
 
         public async Task<DisplayUserDTO> RegisterUser(RegisterUserDTO registerUserDTO)
@@ -231,6 +220,47 @@ namespace Services
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
             await _emailUtility.SendEmail(user.Email, user.Name, user.IsVerified);
+        }
+        public async Task<AuthDTO> GoogleLogin(GoogleLoginDTO googleLoginDTO)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string>() { _settings.Value.GoogleClientId }
+            };
+
+            var response = await GoogleJsonWebSignature.ValidateAsync(googleLoginDTO.Token, settings);
+
+            User user = await _unitOfWork.Users.FindByEmail(response.Email);
+            if (user != null)
+            {
+                return new AuthDTO()
+                {
+                    Token = _tokenUtility.CreateToken(user.Id, user.Username, user.UserType, _settings.Value.SecretKey, _settings.Value.TokenIssuer, _settings.Value.TokenDuration)
+                };
+            }
+
+            User newUser = new User()
+            {
+                Email = response.Email,
+                Name = response.GivenName,
+                LastName = response.FamilyName,
+                Address = _settings.Value.DefaultAddress,
+                BirthDate = DateTime.Parse(_settings.Value.DefaultBirthDate),
+                Password = BCrypt.Net.BCrypt.HashPassword(_settings.Value.DefaultPassword, BCrypt.Net.BCrypt.GenerateSalt()),
+                ImageSource = response.Picture,
+                UserType = UserTypes.BUYER,
+                IsVerified = true,
+                VerificationStatus = VerificationStatuses.ACCEPTED
+            };
+
+            await _unitOfWork.Users.Add(newUser);
+            newUser.Username = newUser.Name + newUser.Id;
+            await _unitOfWork.Save();
+
+            return new AuthDTO()
+            {
+                Token = _tokenUtility.CreateToken(newUser.Id, newUser.Username, newUser.UserType, _settings.Value.SecretKey, _settings.Value.TokenIssuer, _settings.Value.TokenDuration)
+            };
         }
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
         {

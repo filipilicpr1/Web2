@@ -86,5 +86,12 @@ namespace Presentation.Controllers
             PagedListDTO<DisplayUserDTO> displayUsers = await _userService.GetVerifiedSellers(page);
             return Ok(displayUsers);
         }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDTO googleLoginDTO)
+        {
+            AuthDTO authDTO = await _userService.GoogleLogin(googleLoginDTO);
+            return Ok(authDTO);
+        }
     }
 }

@@ -13,8 +13,8 @@ namespace Services.Mapping
     {
         public UserMappingProfile(string defaultImagePath)
         {
-            CreateMap<User, DisplayUserDTO>().ForMember(dest => dest.ImageSource, opt=>opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
-            CreateMap<User, RestrictedDisplayUserDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<User, DisplayUserDTO>().ForMember(dest => dest.ImageSource, opt=>opt.MapFrom(src => src.ImageSource.StartsWith("https://") ? src.ImageSource : defaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<User, RestrictedDisplayUserDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => src.ImageSource.StartsWith("https://") ? src.ImageSource : defaultImagePath + src.ImageSource)).ReverseMap();
             CreateMap<User, RegisterUserDTO>().ReverseMap();
         }
     }

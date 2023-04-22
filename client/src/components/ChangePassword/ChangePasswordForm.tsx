@@ -22,8 +22,6 @@ const ChangePasswordForm: FC = () => {
   const id = useAppSelector((state) => state.user.user?.id);
   const apiState = useAppSelector((state) => state.user.apiState);
   const [requestSent, setRequestSent] = useState<boolean>(false);
-  const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
-  const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
   const [isNewPasswordValid, setIsNewPasswordValid] = useState<boolean>(false);
   const [isNewPasswordTouched, setIsNewPasswordTouched] =
     useState<boolean>(false);
@@ -32,16 +30,6 @@ const ChangePasswordForm: FC = () => {
   const [isConfirmPasswordTouched, setIsConfirmPasswordTouched] =
     useState<boolean>(false);
   const [passwordsMatch, setPasswordsMatch] = useState<boolean>(true);
-
-  const passwordChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsPasswordValid(event.target.value.trim().length >= minPasswordLength);
-  };
-
-  const passwordBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    setIsPasswordTouched(true);
-  };
 
   const newPasswordChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -141,16 +129,12 @@ const ChangePasswordForm: FC = () => {
           >
             <TextField
               margin="normal"
-              required
-              error={isPasswordTouched && !isPasswordValid}
               fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
               autoComplete="current-password"
-              onChange={passwordChangeHandler}
-              onBlur={passwordBlurHandler}
             />
             <TextField
               margin="normal"
@@ -185,7 +169,6 @@ const ChangePasswordForm: FC = () => {
               fullWidth
               variant="contained"
               disabled={
-                !isPasswordValid ||
                 !isNewPasswordValid ||
                 !isConfirmPasswordValid
               }

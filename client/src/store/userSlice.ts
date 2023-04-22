@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Login, GetUserById, UpdateUser, ChangePassword } from "../services/UserService";
-import { IUser, IUserLogin, IAuth, IUserUpdate, IChangePassword } from "../shared/interfaces/userInterfaces";
+import { Login, GetUserById, UpdateUser, ChangePassword, Register, LoginGoogle } from "../services/UserService";
+import { IUser, IUserLogin, IAuth, IUserUpdate, IChangePassword, IUserRegister } from "../shared/interfaces/userInterfaces";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
 import { defaultErrorMessage } from "../constants/Constants";
@@ -55,6 +55,18 @@ export const updateUserAction = createAsyncThunk(
   }
 );
 
+export const registerUserAction = createAsyncThunk(
+  "register/default",
+  async (data: IUserRegister, thunkApi) => {
+    try {
+      const response = await Register(data);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 interface IChangePasswordAction {
   id: string,
   data: IChangePassword
@@ -65,6 +77,18 @@ export const changePasswordAction = createAsyncThunk(
   async (data: IChangePasswordAction , thunkApi) => {
     try {
       const response = await ChangePassword(data.id, data.data);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+export const googleLoginAction = createAsyncThunk(
+  "user/googleLogin",
+  async (data: IAuth , thunkApi) => {
+    try {
+      const response = await LoginGoogle(data);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -194,6 +218,64 @@ const userSlice = createSlice({
       }
     );
     builder.addCase(changePasswordAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(registerUserAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      registerUserAction.fulfilled,
+      (state) => {
+        state.apiState = "COMPLETED";
+        toast.success("You have registered successfully. Try signing in.", {
+            position: "top-center",
+            autoClose: 2500,
+            closeOnClick: true,
+            pauseOnHover: false,
+          });
+      }
+    );
+    builder.addCase(registerUserAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(googleLoginAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      googleLoginAction.fulfilled,
+      (state, action: PayloadAction<IAuth>) => {
+        state.apiState = "COMPLETED";
+        const token = action.payload.token;
+        state.token = token;
+        state.isLoggedIn = true;
+        localStorage.setItem("token", token);
+      }
+    );
+    builder.addCase(googleLoginAction.rejected, (state, action) => {
       state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {

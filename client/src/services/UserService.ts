@@ -1,6 +1,6 @@
 import { axiosClient } from "./axiosClient";
 import { API } from "../constants/Constants";
-import { IUserLogin, IChangePassword, IUserRegister } from "../shared/interfaces/userInterfaces";
+import { IUserLogin, IChangePassword, IUserRegister, IAuth } from "../shared/interfaces/userInterfaces";
 
 export const Login = async (userLogin: IUserLogin) => {
     return await axiosClient.post(`${API}/users/login`, userLogin);
@@ -20,4 +20,8 @@ export const ChangePassword = async (id: string, data: IChangePassword) => {
 
 export const Register = async (data: IUserRegister) => {
     return await axiosClient.post(`${API}/users`, data);
+}
+
+export const LoginGoogle = async (data: IAuth) => {
+    return await axiosClient.post(`${API}/users/google-login`, data);
 }

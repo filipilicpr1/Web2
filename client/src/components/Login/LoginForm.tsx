@@ -8,14 +8,17 @@ import {
   Box,
   Typography,
   Container,
-  Zoom
+  Zoom,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { emailRegex, minPasswordLength } from "../../constants/Constants";
 import { IUserLogin } from "../../shared/interfaces/userInterfaces";
 import { useAppDispatch } from "../../store/hooks";
-import { loginAction } from "../../store/userSlice";
+import { loginAction, googleLoginAction } from "../../store/userSlice";
+import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
+import { defaultErrorMessage } from "../../constants/Constants";
 
 const LoginForm: FC = () => {
   const dispatch = useAppDispatch();
@@ -58,6 +61,18 @@ const LoginForm: FC = () => {
     };
 
     dispatch(loginAction(userLogin));
+  };
+
+  const responseMessage = (response: any) => {
+    dispatch(googleLoginAction({ token: response.credential }));
+  };
+  const errorMessage = () => {
+    toast.error(defaultErrorMessage, {
+      position: "top-center",
+      autoClose: 2500,
+      closeOnClick: true,
+      pauseOnHover: false,
+    });
   };
 
   return (
@@ -119,8 +134,14 @@ const LoginForm: FC = () => {
               Sign In
             </Button>
             <Grid container sx={{ justifyContent: "flex-end" }}>
-              <Grid item>
+              <Grid item sx={{ display: "flex", flexDirection: "column" }}>
                 <Link to="/register">{"Don't have an account? Sign Up"}</Link>
+                <Box sx={{ mt: 4, width: "100%" }}>
+                  <GoogleLogin
+                    onSuccess={responseMessage}
+                    onError={errorMessage}
+                  />
+                </Box>
               </Grid>
             </Grid>
           </Box>

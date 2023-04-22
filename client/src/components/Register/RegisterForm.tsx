@@ -5,14 +5,12 @@ import {
   CssBaseline,
   TextField,
   MenuItem,
-  Grid,
   Box,
   Typography,
   Container,
   Zoom,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { emailRegex, minPasswordLength } from "../../constants/Constants";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -21,13 +19,13 @@ import { registerUserTypes } from "../../constants/Constants";
 import { IUserRegister } from "../../shared/interfaces/userInterfaces";
 import { UserType } from "../../shared/types/enumerations";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { registerAction } from "../../store/registerSlice";
+import { registerUserAction } from "../../store/userSlice";
 import { useNavigate } from "react-router-dom";
 
 const RegisterForm: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const apiState = useAppSelector((state) => state.register.apiState);
+  const apiState = useAppSelector((state) => state.user.apiState);
   const [requestSent, setRequestSent] = useState<boolean>(false);
   const [isNameValid, setIsNameValid] = useState<boolean>(false);
   const [isNameTouched, setIsNameTouched] = useState<boolean>(false);
@@ -185,7 +183,7 @@ const RegisterForm: FC = () => {
       birthDate: date || new Date(),
     };
 
-    dispatch(registerAction(registerUser));
+    dispatch(registerUserAction(registerUser));
     setRequestSent(true);
   };
 
@@ -213,7 +211,7 @@ const RegisterForm: FC = () => {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: "info.main" }}>
-            <LockOutlinedIcon />
+            <PersonAddIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign up
@@ -356,11 +354,6 @@ const RegisterForm: FC = () => {
             >
               Sign Up
             </Button>
-            <Grid container sx={{ justifyContent: "flex-end" }}>
-              <Grid item>
-                <Link to="/register">{"Sign Up with Google instead"}</Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Zoom>
