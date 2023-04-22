@@ -7,6 +7,7 @@ import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import ChangePasswordPage from "../pages/ChangePasswordPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -25,6 +26,7 @@ const AppRoutes: FC = () => {
           <Route element={<AppLayout />}>  
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
             <Route path="*" element={<Navigate replace to={"/"} />} />
           </Route>
         )}

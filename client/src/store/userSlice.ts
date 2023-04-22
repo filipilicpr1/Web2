@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Login, GetUserById, UpdateUser } from "../services/UserService";
-import { IUser, IUserLogin, IAuth, IUserUpdate } from "../shared/interfaces/userInterfaces";
+import { Login, GetUserById, UpdateUser, ChangePassword } from "../services/UserService";
+import { IUser, IUserLogin, IAuth, IUserUpdate, IChangePassword } from "../shared/interfaces/userInterfaces";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
 import { defaultErrorMessage } from "../constants/Constants";
@@ -55,6 +55,23 @@ export const updateUserAction = createAsyncThunk(
   }
 );
 
+interface IChangePasswordAction {
+  id: string,
+  data: IChangePassword
+}
+
+export const changePasswordAction = createAsyncThunk(
+  "user/changePassword",
+  async (data: IChangePasswordAction , thunkApi) => {
+    try {
+      const response = await ChangePassword(data.id, data.data);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -87,7 +104,7 @@ const userSlice = createSlice({
       }
     );
     builder.addCase(loginAction.rejected, (state, action) => {
-      state.apiState = "COMPLETED";
+      state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {
         error = action.payload;
@@ -113,7 +130,7 @@ const userSlice = createSlice({
       }
     );
     builder.addCase(getUserByIdAction.rejected, (state, action) => {
-      state.apiState = "COMPLETED";
+      state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {
         error = action.payload;
@@ -146,7 +163,38 @@ const userSlice = createSlice({
       }
     );
     builder.addCase(updateUserAction.rejected, (state, action) => {
-      state.apiState = "COMPLETED";
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(changePasswordAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      changePasswordAction.fulfilled,
+      (state) => {
+        state.apiState = "COMPLETED";
+
+        toast.success("Password changed", {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
+    builder.addCase(changePasswordAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {
         error = action.payload;

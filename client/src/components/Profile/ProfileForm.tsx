@@ -10,7 +10,7 @@ import ProfileVerificationIcon from "./ProfileVerificationIcon";
 const ProfileForm: FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user.user);
-  const [date, setDate] = useState<Date | null>(new Date("1998-12-18"));
+  const [date, setDate] = useState<Date | null>(new Date());
   const imagePicker = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState(user?.imageSource);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);

@@ -96,7 +96,7 @@ const NavigationList: FC = () => {
   });
 
   useEffect(() => {
-    if (pathname === "/profile" || pathname === "change-password") {
+    if (pathname === "/profile" || pathname === "/change-password") {
       setSelectedIndex(-1);
       return;
     }

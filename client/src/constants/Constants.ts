@@ -7,3 +7,5 @@ export const minPasswordLength: number = 4;
 export const defaultErrorMessage: string = "Something went wrong";
 
 export const drawerWidth: number = 240;
+
+export const registerUserTypes = ["BUYER", "SELLER"];

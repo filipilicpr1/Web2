@@ -34,6 +34,12 @@ const AvatarWithOptions: FC = () => {
     dispatch(logout());
     setAnchorEl(null);
   }
+  
+  const changePasswordClickHandler = () => {
+    navigate("/change-password");
+    setAnchorEl(null);
+  }
+
   return (
     <>
       <Tooltip title={"Settings"}>
@@ -87,7 +93,7 @@ const AvatarWithOptions: FC = () => {
           <Avatar /> Profile
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={changePasswordClickHandler}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>

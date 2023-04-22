@@ -1,6 +1,6 @@
 import { axiosClient } from "./axiosClient";
 import { API } from "../constants/Constants";
-import { IUserLogin } from "../shared/interfaces/userInterfaces";
+import { IUserLogin, IChangePassword, IUserRegister } from "../shared/interfaces/userInterfaces";
 
 export const Login = async (userLogin: IUserLogin) => {
     return await axiosClient.post(`${API}/users/login`, userLogin);
@@ -12,4 +12,12 @@ export const GetUserById = async (id: string) => {
 
 export const UpdateUser = async (id: string, data: FormData) => {
     return await axiosClient.put(`${API}/users/${id}`, data);
+}
+
+export const ChangePassword = async (id: string, data: IChangePassword) => {
+    return await axiosClient.put(`${API}/users/${id}/change-password`, data);
+}
+
+export const Register = async (data: IUserRegister) => {
+    return await axiosClient.post(`${API}/users`, data);
 }

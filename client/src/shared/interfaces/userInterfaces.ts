@@ -31,3 +31,19 @@ export interface IAuth {
 export interface IJwt {
     id: string
 }
+
+export interface IChangePassword {
+    currentPassword: string,
+    newPassword: string
+}
+
+export interface IUserRegister {
+    name: string,
+    lastName: string,
+    username: string,
+    email: string,
+    password: string,
+    birthDate: Date,
+    address: string,
+    userType: UserType
+}
