@@ -2,12 +2,19 @@ import React, { FC } from "react";
 import { Typography } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../../store/hooks";
 
 const Logo: FC = () => {
+  const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
   const navigate = useNavigate();
 
   const clickHandler = () => {
-    navigate("/");
+    if(isLoggedIn)
+    {
+      navigate("/");
+      return;
+    }
+    navigate("/login");
   };
 
   return (

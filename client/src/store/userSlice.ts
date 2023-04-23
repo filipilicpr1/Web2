@@ -56,7 +56,7 @@ export const updateUserAction = createAsyncThunk(
 );
 
 export const registerUserAction = createAsyncThunk(
-  "register/default",
+  "user/register",
   async (data: IUserRegister, thunkApi) => {
     try {
       const response = await Register(data);

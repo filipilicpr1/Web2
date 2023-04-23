@@ -20,7 +20,7 @@ import { IUserRegister } from "../../shared/interfaces/userInterfaces";
 import { UserType } from "../../shared/types/enumerations";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { registerUserAction } from "../../store/userSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const RegisterForm: FC = () => {
   const navigate = useNavigate();
@@ -354,6 +354,9 @@ const RegisterForm: FC = () => {
             >
               Sign Up
             </Button>
+            <Box sx={{display: "flex", flexDirection: "row", justifyContent: "flex-end", mb: 2}}>
+            <Link to="/login">{"Back to login"}</Link>
+            </Box>
           </Box>
         </Box>
       </Zoom>
