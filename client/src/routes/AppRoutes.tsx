@@ -29,16 +29,21 @@ const AppRoutes: FC = () => {
             <Route path="*" element={<Navigate replace to={"/login"} />} />
           </Route>
         )}
-        {isLoggedIn && (
+        {isLoggedIn && finishedRegistration && (
           <Route element={<AppLayout />}>
             <Route path="/" element={<HomePage />} />
-            {finishedRegistration && <Route path="/profile" element={<ProfilePage />} />}
-            {finishedRegistration && <Route path="/change-password" element={<ChangePasswordPage />} />}
-            {!finishedRegistration && <Route path="/finish-registration" element={<FinishRegistrationPage />} />}
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
             {isVerifiedSeller && (
               <Route path="/new-product" element={<NewProductPage />} />
             )}
             <Route path="*" element={<Navigate replace to={"/"} />} />
+          </Route>
+        )}
+        {isLoggedIn && !finishedRegistration && (
+          <Route element={<AppLayout />}>
+            <Route path="/finish-registration" element={<FinishRegistrationPage />} />
+            <Route path="*" element={<Navigate replace to={"/finish-registration"} />} />
           </Route>
         )}
       </Routes>
