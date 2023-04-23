@@ -13,8 +13,6 @@ import {
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { emailRegex, minPasswordLength } from "../../constants/Constants";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { registerUserTypes } from "../../constants/Constants";
 import { IUserRegister } from "../../shared/interfaces/userInterfaces";
 import { UserType } from "../../shared/types/enumerations";
@@ -172,6 +170,8 @@ const RegisterForm: FC = () => {
       return;
     }
 
+    date.setHours(12);
+
     const registerUser: IUserRegister = {
       email: email.toString().trim(),
       password: password.toString().trim(),
@@ -180,7 +180,7 @@ const RegisterForm: FC = () => {
       lastName: lastName.toString().trim(),
       address: address.toString().trim(),
       userType: userType.toString().trim() as UserType,
-      birthDate: date || new Date(),
+      birthDate: date
     };
 
     dispatch(registerUserAction(registerUser));
@@ -310,14 +310,12 @@ const RegisterForm: FC = () => {
               onChange={addressChangeHandler}
               onBlur={addressBlurHandler}
             />
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DesktopDatePicker
                 format="dd/MM/yyyy"
                 label="Birth Date*"
                 sx={{ mt: 2, mb: 1, width: "100%", border: dateBorder }}
                 onChange={(newValue) => dateChangeHandler(newValue as Date)}
               />
-            </LocalizationProvider>
             <TextField
               id="userType"
               name="userType"

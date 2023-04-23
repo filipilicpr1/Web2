@@ -27,6 +27,7 @@ const ProfileForm: FC = () => {
 
     const data = new FormData(event.currentTarget);
     if (date !== null) {
+      date.setHours(12);
       data.append("birthDate", date.toISOString());
     }
     if (uploadedImage !== null) {

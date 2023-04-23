@@ -1,8 +1,6 @@
 import React, { FC } from "react";
 import { Grid, Box, InputLabel } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns"
 
 interface IProps {
   id: string;
@@ -42,14 +40,12 @@ const ProfileFormDate: FC<IProps> = (props) => {
         </InputLabel>
       </Box>
       <Box mr={-30} mt={2} width={800}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DesktopDatePicker
             defaultValue={new Date(props.initialValue || new Date())}
             format="dd/MM/yyyy"
             onChange={(newValue) => props.setValue(newValue)}
             sx={{ width: 290}}
           />
-        </LocalizationProvider>
       </Box>
     </Grid>
   );
