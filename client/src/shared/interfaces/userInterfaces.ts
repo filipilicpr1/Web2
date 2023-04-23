@@ -15,6 +15,16 @@ export interface IUser {
     imageSource: string
 }
 
+export interface IUserMinimal {
+    id: string,
+    name: string,
+    lastName: string,
+    username: string,
+    email: string,
+    address: string,
+    imageSource: string
+}
+
 export interface IUserLogin {
     email: string,
     password: string
