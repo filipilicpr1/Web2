@@ -93,5 +93,13 @@ namespace Presentation.Controllers
             AuthDTO authDTO = await _userService.GoogleLogin(googleLoginDTO);
             return Ok(authDTO);
         }
+
+        [HttpPut("{id}/finish-registration")]
+        [Authorize]
+        public async Task<IActionResult> FinishRegistration(Guid id, [FromBody] FinishRegistrationDTO finishRegistrationDTO)
+        {
+            AuthDTO authDto = await _userService.FinishRegistration(id, User.Identity.Name, finishRegistrationDTO);
+            return Ok(authDto);
+        }
     }
 }

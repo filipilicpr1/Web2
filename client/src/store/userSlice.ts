@@ -1,6 +1,22 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Login, GetUserById, UpdateUser, ChangePassword, Register, LoginGoogle } from "../services/UserService";
-import { IUser, IUserLogin, IAuth, IUserUpdate, IChangePassword, IUserRegister } from "../shared/interfaces/userInterfaces";
+import {
+  Login,
+  GetUserById,
+  UpdateUser,
+  ChangePassword,
+  Register,
+  LoginGoogle,
+  FinishRegistration,
+} from "../services/UserService";
+import {
+  IUser,
+  IUserLogin,
+  IAuth,
+  IUserUpdate,
+  IChangePassword,
+  IUserRegister,
+  IFinishRegistration,
+} from "../shared/interfaces/userInterfaces";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
 import { defaultErrorMessage } from "../constants/Constants";
@@ -8,6 +24,7 @@ import { defaultErrorMessage } from "../constants/Constants";
 export interface UserState {
   token: string | null;
   isLoggedIn: boolean;
+  finishedRegistration: boolean;
   user: IUser | null;
   apiState: ApiCallState;
 }
@@ -15,7 +32,14 @@ export interface UserState {
 const initialState: UserState = {
   token: localStorage.getItem("token"),
   isLoggedIn: localStorage.getItem("token") != null,
-  user: JSON.parse(localStorage.getItem("user") || "{}"),
+  finishedRegistration:
+    localStorage.getItem("user") !== null
+      ? JSON.parse(localStorage.getItem("user") as string).finishedRegistration
+      : false,
+  user:
+    localStorage.getItem("user") !== null
+      ? JSON.parse(localStorage.getItem("user") as string)
+      : null,
   apiState: "COMPLETED",
 };
 
@@ -45,7 +69,7 @@ export const getUserByIdAction = createAsyncThunk(
 
 export const updateUserAction = createAsyncThunk(
   "user/update",
-  async (data: IUserUpdate , thunkApi) => {
+  async (data: IUserUpdate, thunkApi) => {
     try {
       const response = await UpdateUser(data.id, data.data);
       return thunkApi.fulfillWithValue(response.data);
@@ -68,13 +92,13 @@ export const registerUserAction = createAsyncThunk(
 );
 
 interface IChangePasswordAction {
-  id: string,
-  data: IChangePassword
+  id: string;
+  data: IChangePassword;
 }
 
 export const changePasswordAction = createAsyncThunk(
   "user/changePassword",
-  async (data: IChangePasswordAction , thunkApi) => {
+  async (data: IChangePasswordAction, thunkApi) => {
     try {
       const response = await ChangePassword(data.id, data.data);
       return thunkApi.fulfillWithValue(response.data);
@@ -86,9 +110,26 @@ export const changePasswordAction = createAsyncThunk(
 
 export const googleLoginAction = createAsyncThunk(
   "user/googleLogin",
-  async (data: IAuth , thunkApi) => {
+  async (data: IAuth, thunkApi) => {
     try {
       const response = await LoginGoogle(data);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+interface IFinishRegistrationAction {
+  id: string;
+  data: IFinishRegistration;
+}
+
+export const finishRegistrationAction = createAsyncThunk(
+  "user/finishRegistration",
+  async (data: IFinishRegistrationAction, thunkApi) => {
+    try {
+      const response = await FinishRegistration(data.id, data.data);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -109,9 +150,9 @@ const userSlice = createSlice({
       state.token = null;
       state.isLoggedIn = false;
       state.user = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loginAction.pending, (state) => {
@@ -124,6 +165,7 @@ const userSlice = createSlice({
         const token = action.payload.token;
         state.token = token;
         state.isLoggedIn = true;
+        state.finishedRegistration = true;
         localStorage.setItem("token", token);
       }
     );
@@ -149,8 +191,9 @@ const userSlice = createSlice({
       getUserByIdAction.fulfilled,
       (state, action: PayloadAction<IUser>) => {
         state.apiState = "COMPLETED";
-        state.user = {...action.payload};
-        localStorage.setItem('user', JSON.stringify(action.payload));
+        state.user = { ...action.payload };
+        state.finishedRegistration = action.payload.finishedRegistration;
+        localStorage.setItem("user", JSON.stringify(action.payload));
       }
     );
     builder.addCase(getUserByIdAction.rejected, (state, action) => {
@@ -175,8 +218,8 @@ const userSlice = createSlice({
       updateUserAction.fulfilled,
       (state, action: PayloadAction<IUser>) => {
         state.apiState = "COMPLETED";
-        state.user = {...action.payload};
-        localStorage.setItem('user', JSON.stringify(action.payload));
+        state.user = { ...action.payload };
+        localStorage.setItem("user", JSON.stringify(action.payload));
 
         toast.success("Your info has been updated", {
           position: "top-center",
@@ -204,19 +247,16 @@ const userSlice = createSlice({
     builder.addCase(changePasswordAction.pending, (state) => {
       state.apiState = "PENDING";
     });
-    builder.addCase(
-      changePasswordAction.fulfilled,
-      (state) => {
-        state.apiState = "COMPLETED";
+    builder.addCase(changePasswordAction.fulfilled, (state) => {
+      state.apiState = "COMPLETED";
 
-        toast.success("Password changed", {
-          position: "top-center",
-          autoClose: 2500,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
-      }
-    );
+      toast.success("Password changed", {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
     builder.addCase(changePasswordAction.rejected, (state, action) => {
       state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
@@ -235,18 +275,15 @@ const userSlice = createSlice({
     builder.addCase(registerUserAction.pending, (state) => {
       state.apiState = "PENDING";
     });
-    builder.addCase(
-      registerUserAction.fulfilled,
-      (state) => {
-        state.apiState = "COMPLETED";
-        toast.success("You have registered successfully. Try signing in.", {
-            position: "top-center",
-            autoClose: 2500,
-            closeOnClick: true,
-            pauseOnHover: false,
-          });
-      }
-    );
+    builder.addCase(registerUserAction.fulfilled, (state) => {
+      state.apiState = "COMPLETED";
+      toast.success("You have registered successfully. Try signing in.", {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
     builder.addCase(registerUserAction.rejected, (state, action) => {
       state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
@@ -272,10 +309,47 @@ const userSlice = createSlice({
         const token = action.payload.token;
         state.token = token;
         state.isLoggedIn = true;
+        state.finishedRegistration = true;
         localStorage.setItem("token", token);
       }
     );
     builder.addCase(googleLoginAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(finishRegistrationAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      finishRegistrationAction.fulfilled,
+      (state, action: PayloadAction<IAuth>) => {
+        state.apiState = "COMPLETED";
+        const token = action.payload.token;
+        state.token = token;
+        state.isLoggedIn = true;
+        state.finishedRegistration = true;
+        localStorage.setItem("token", token);
+
+        toast.success("Your have been successfully registered", {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
+    builder.addCase(finishRegistrationAction.rejected, (state, action) => {
       state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {

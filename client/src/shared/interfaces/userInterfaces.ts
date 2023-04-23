@@ -11,6 +11,7 @@ export interface IUser {
     userType: UserType,
     isVerified: boolean,
     verificationStatus: VerificationStatuses,
+    finishedRegistration: boolean,
     imageSource: string
 }
 
@@ -46,4 +47,12 @@ export interface IUserRegister {
     birthDate: Date,
     address: string,
     userType: UserType
+}
+
+export interface IFinishRegistration {
+    username: string,
+    password: string,
+    userType: UserType,
+    address: string,
+    birthDate: Date
 }

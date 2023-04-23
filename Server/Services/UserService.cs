@@ -122,7 +122,8 @@ namespace Services
             user.IsVerified = user.UserType != UserTypes.SELLER;
             user.VerificationStatus = user.IsVerified ? VerificationStatuses.ACCEPTED : VerificationStatuses.PENDING;
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, BCrypt.Net.BCrypt.GenerateSalt());
-            
+            user.FinishedRegistration = true;
+
             await _unitOfWork.Users.Add(user);
             await _unitOfWork.Save();
 
@@ -140,6 +141,11 @@ namespace Services
             if (!String.Equals(user.Username, username))
             {
                 throw new BadRequestException("You can only change your info");
+            }
+
+            if (!user.FinishedRegistration)
+            {
+                throw new BadRequestException("Please finish the registration first");
             }
 
             string errorMessage;
@@ -183,6 +189,11 @@ namespace Services
             if (!String.Equals(user.Username, username))
             {
                 throw new BadRequestException("You can only change your password");
+            }
+
+            if (!user.FinishedRegistration)
+            {
+                throw new BadRequestException("Please finish the registration first");
             }
 
             if (!BCrypt.Net.BCrypt.Verify(changePasswordDTO.CurrentPassword, user.Password))
@@ -249,8 +260,9 @@ namespace Services
                 Password = BCrypt.Net.BCrypt.HashPassword(_settings.Value.DefaultPassword, BCrypt.Net.BCrypt.GenerateSalt()),
                 ImageSource = response.Picture,
                 UserType = UserTypes.BUYER,
-                IsVerified = true,
-                VerificationStatus = VerificationStatuses.ACCEPTED
+                IsVerified = false,
+                VerificationStatus = VerificationStatuses.ACCEPTED,
+                FinishedRegistration = false
             };
 
             await _unitOfWork.Users.Add(newUser);
@@ -260,6 +272,53 @@ namespace Services
             return new AuthDTO()
             {
                 Token = _tokenUtility.CreateToken(newUser.Id, newUser.Username, newUser.UserType, _settings.Value.SecretKey, _settings.Value.TokenIssuer, _settings.Value.TokenDuration)
+            };
+        }
+
+        public async Task<AuthDTO> FinishRegistration(Guid id, string username, FinishRegistrationDTO finishRegistrationDTO)
+        {
+            User user = await _unitOfWork.Users.Find(id);
+            if(user == null)
+            {
+                throw new BadRequestException("User with id " + id + " does not exist");
+            }
+
+            if(!String.Equals(user.Username, username))
+            {
+                throw new BadRequestException("You can finish only your registration process");
+            }
+
+            if(user.FinishedRegistration)
+            {
+                throw new BadRequestException("You have already finished your registration");
+            }
+
+            string message;
+            bool fieldsAreValid = ValidateFinishRegistration(finishRegistrationDTO, out message);
+            if(!fieldsAreValid)
+            {
+                throw new BadRequestException(message);
+            }
+
+            bool usernameExists = await _unitOfWork.Users.FindByUsername(finishRegistrationDTO.Username) != null;
+            if (usernameExists)
+            {
+                throw new BadRequestException("User with username " + finishRegistrationDTO.Username + " already exists");
+            }
+
+            user.Username = finishRegistrationDTO.Username;
+            user.Address = finishRegistrationDTO.Address;
+            user.BirthDate = finishRegistrationDTO.BirthDate;
+            user.UserType = Enum.Parse<UserTypes>(finishRegistrationDTO.UserType);
+            user.IsVerified = user.UserType != UserTypes.SELLER;
+            user.VerificationStatus = user.IsVerified ? VerificationStatuses.ACCEPTED : VerificationStatuses.PENDING;
+            user.Password = BCrypt.Net.BCrypt.HashPassword(finishRegistrationDTO.Password, BCrypt.Net.BCrypt.GenerateSalt());
+            user.FinishedRegistration = true;
+            await _unitOfWork.Save();
+
+            return new AuthDTO() 
+            { 
+                Token = _tokenUtility.CreateToken(user.Id, user.Username, user.UserType, _settings.Value.SecretKey, _settings.Value.TokenIssuer, _settings.Value.TokenDuration) 
             };
         }
         public async Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page)
@@ -300,9 +359,9 @@ namespace Services
                 return false;
             }
 
-            if (String.IsNullOrWhiteSpace(registerUserDTO.Username))
+            bool usernameIsValid = ValidateUsername(registerUserDTO.Username, out message);
+            if (!usernameIsValid) 
             {
-                message = "Username can't be empty";
                 return false;
             }
 
@@ -375,15 +434,88 @@ namespace Services
                 return false;
             }
 
+            bool addressIsValid = ValidateAddress(address, out message);
+            if (!addressIsValid)
+            {
+                return false;
+            }
+
+            bool birthDateIsValid = ValidateBirthDate(birthDate, out message);
+            if(!birthDateIsValid)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        
+        private bool ValidateBirthDate(DateTime birthDate, out string message)
+        {
+            message = "";
+            if (birthDate.Year < _settings.Value.MinBirthYear || birthDate > DateTime.Now)
+            {
+                message = "Invalid birth date";
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateUsername(string username, out string message)
+        {
+            message = "";
+            if (String.IsNullOrWhiteSpace(username))
+            {
+                message = "Username can't be empty";
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateAddress(string address, out string message)
+        {
+            message = "";
             if (String.IsNullOrWhiteSpace(address))
             {
                 message = "Address can't be empty";
                 return false;
             }
 
-            if (birthDate.Year < _settings.Value.MinBirthYear || birthDate > DateTime.Now)
+            return true;
+        }
+
+        private bool ValidateFinishRegistration(FinishRegistrationDTO finishRegistrationDTO, out string message)
+        {
+            message = "";
+            bool passwordIsValid = ValidatePassword(finishRegistrationDTO.Password, out message);
+            if (!passwordIsValid)
             {
-                message = "Invalid birth date";
+                return false;
+            }
+
+            bool usernameIsValid = ValidateUsername(finishRegistrationDTO.Username, out message);
+            if (!usernameIsValid)
+            {
+                return false;
+            }
+
+            bool addressIsValid = ValidateAddress(finishRegistrationDTO.Address, out message);
+            if (!addressIsValid)
+            {
+                return false;
+            }
+
+            bool birthDateIsValid = ValidateBirthDate(finishRegistrationDTO.BirthDate, out message);
+            if (!birthDateIsValid) 
+            {
+                return false;
+            }
+
+            if (finishRegistrationDTO.UserType == null || (!String.Equals(finishRegistrationDTO.UserType.Trim().ToLower(), "seller") &&
+                                                           !String.Equals(finishRegistrationDTO.UserType.Trim().ToLower(), "buyer")))
+            {
+                message = "Invalid user type";
                 return false;
             }
 

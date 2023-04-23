@@ -11,11 +11,13 @@ import Logout from "@mui/icons-material/Logout";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { logout } from "../../../store/userSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AvatarWithOptions: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user.user);
+  const finishedRegistration = user && user.finishedRegistration;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,19 +28,40 @@ const AvatarWithOptions: FC = () => {
   };
 
   const profileClickHandler = () => {
+    if (!finishedRegistration) {
+      toast.info("Please finish the registration first", {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+      setAnchorEl(null);
+      return;
+    }
+
     navigate("/profile");
     setAnchorEl(null);
-  }
+  };
 
   const logoutHandler = () => {
     dispatch(logout());
     setAnchorEl(null);
-  }
-  
+  };
+
   const changePasswordClickHandler = () => {
+    if (!finishedRegistration) {
+      toast.info("Please finish the registration first", {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+      setAnchorEl(null);
+      return;
+    }
     navigate("/change-password");
     setAnchorEl(null);
-  }
+  };
 
   return (
     <>

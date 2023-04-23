@@ -20,6 +20,7 @@ namespace Domain.Models
         public UserTypes UserType { get; set; }
         public bool IsVerified { get; set; }
         public VerificationStatuses VerificationStatus { get; set; }
+        public bool FinishedRegistration { get; set; }
         public string ImageSource { get; set; }
         public List<Order> Orders { get; set; }
         public List<Product> Products { get; set; }

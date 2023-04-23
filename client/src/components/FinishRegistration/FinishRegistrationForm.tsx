@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import {
   Avatar,
   Button,
@@ -10,27 +10,21 @@ import {
   Container,
   Zoom,
 } from "@mui/material";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { emailRegex, minPasswordLength } from "../../constants/Constants";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import { minPasswordLength } from "../../constants/Constants";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { registerUserTypes } from "../../constants/Constants";
-import { IUserRegister } from "../../shared/interfaces/userInterfaces";
+import { IFinishRegistration } from "../../shared/interfaces/userInterfaces";
 import { UserType } from "../../shared/types/enumerations";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { registerUserAction } from "../../store/userSlice";
-import { useNavigate, Link } from "react-router-dom";
+import { finishRegistrationAction } from "../../store/userSlice";
 
-const RegisterForm: FC = () => {
-  const navigate = useNavigate();
+const FinishRegistrationForm: FC = () => {
   const dispatch = useAppDispatch();
-  const apiState = useAppSelector((state) => state.user.apiState);
-  const [requestSent, setRequestSent] = useState<boolean>(false);
-  const [isNameValid, setIsNameValid] = useState<boolean>(false);
-  const [isNameTouched, setIsNameTouched] = useState<boolean>(false);
-  const [isLastNameValid, setIsLastNameValid] = useState<boolean>(false);
-  const [isLastNameTouched, setIsLastNameTouched] = useState<boolean>(false);
+  const user = useAppSelector((state) => state.user.user);
+  const id = user?.id || "";
   const [isUsernameValid, setIsUsernameValid] = useState<boolean>(false);
   const [isUsernameTouched, setIsUsernameTouched] = useState<boolean>(false);
   const [isAddressValid, setIsAddressValid] = useState<boolean>(false);
@@ -38,8 +32,6 @@ const RegisterForm: FC = () => {
   const [userType, setUserType] = useState<string>("");
   const [isUserTypeValid, setIsUserTypeValid] = useState<boolean>(false);
   const [isUserTypeTouched, setIsUserTypeTouched] = useState<boolean>(false);
-  const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
-  const [isEmailTouched, setIsEmailTouched] = useState<boolean>(false);
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
   const [isPasswordTouched, setIsPasswordTouched] = useState<boolean>(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] =
@@ -69,24 +61,6 @@ const RegisterForm: FC = () => {
     setIsUserTypeTouched(true);
   };
 
-  const nameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsNameValid(event.target.value.trim().length > 0);
-  };
-
-  const nameBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    setIsNameTouched(true);
-  };
-
-  const lastNameChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsLastNameValid(event.target.value.trim().length > 0);
-  };
-
-  const lastNameBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    setIsLastNameTouched(true);
-  };
-
   const usernameChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -103,14 +77,6 @@ const RegisterForm: FC = () => {
 
   const addressBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
     setIsAddressTouched(true);
-  };
-
-  const emailChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsEmailValid(emailRegex.test(event.target.value));
-  };
-
-  const emailBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    setIsEmailTouched(true);
   };
 
   const passwordChangeHandler = (
@@ -143,21 +109,15 @@ const RegisterForm: FC = () => {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
-    const email = data.get("email");
     const password = data.get("password");
     const confirmPassword = data.get("confirmPassword");
     const username = data.get("username");
-    const name = data.get("name");
-    const lastName = data.get("lastName");
     const address = data.get("address");
     const userType = data.get("userType");
     if (
-      email == null ||
       password == null ||
       confirmPassword == null ||
       username == null ||
-      name == null ||
-      lastName == null ||
       address == null ||
       userType == null ||
       date == null
@@ -172,31 +132,16 @@ const RegisterForm: FC = () => {
       return;
     }
 
-    const registerUser: IUserRegister = {
-      email: email.toString().trim(),
+    const registerUser: IFinishRegistration = {
       password: password.toString().trim(),
       username: username.toString().trim(),
-      name: name.toString().trim(),
-      lastName: lastName.toString().trim(),
       address: address.toString().trim(),
       userType: userType.toString().trim() as UserType,
       birthDate: date || new Date(),
     };
 
-    dispatch(registerUserAction(registerUser));
-    setRequestSent(true);
+    dispatch(finishRegistrationAction({id: id, data: registerUser}));
   };
-
-  useEffect(() => {
-    if (!requestSent) {
-      return;
-    }
-
-    if (!(apiState === "COMPLETED")) {
-      return;
-    }
-    navigate("/login");
-  }, [apiState, navigate, requestSent]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -210,11 +155,11 @@ const RegisterForm: FC = () => {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "info.main" }}>
-            <PersonAddIcon />
+          <Avatar sx={{ m: 1, bgcolor: "info.main", mb: 2 }}>
+            <ManageAccountsIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Finish Registration
           </Typography>
           <Box
             component="form"
@@ -225,14 +170,14 @@ const RegisterForm: FC = () => {
             <TextField
               margin="normal"
               required
-              error={isEmailTouched && !isEmailValid}
+              error={isUsernameTouched && !isUsernameValid}
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              onChange={emailChangeHandler}
-              onBlur={emailBlurHandler}
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              onChange={usernameChangeHandler}
+              onBlur={usernameBlurHandler}
             />
             <TextField
               margin="normal"
@@ -261,42 +206,6 @@ const RegisterForm: FC = () => {
               onChange={confirmPasswordChangeHandler}
               onBlur={confirmPasswordBlurHandler}
               helperText={!passwordsMatch && "Passwords must match"}
-            />
-            <TextField
-              margin="normal"
-              required
-              error={isUsernameTouched && !isUsernameValid}
-              fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
-              onChange={usernameChangeHandler}
-              onBlur={usernameBlurHandler}
-            />
-            <TextField
-              margin="normal"
-              required
-              error={isNameTouched && !isNameValid}
-              fullWidth
-              id="name"
-              label="Name"
-              name="name"
-              autoComplete="name"
-              onChange={nameChangeHandler}
-              onBlur={nameBlurHandler}
-            />
-            <TextField
-              margin="normal"
-              required
-              error={isLastNameTouched && !isLastNameValid}
-              fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="lastName"
-              onChange={lastNameChangeHandler}
-              onBlur={lastNameBlurHandler}
             />
             <TextField
               margin="normal"
@@ -341,23 +250,17 @@ const RegisterForm: FC = () => {
               fullWidth
               variant="contained"
               disabled={
-                !isEmailValid ||
                 !isPasswordValid ||
                 !isConfirmPasswordValid ||
                 !isUsernameValid ||
-                !isNameValid ||
-                !isLastNameValid ||
                 !isAddressValid ||
                 !isUserTypeValid ||
                 !isDateValid
               }
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Finish
             </Button>
-            <Box sx={{display: "flex", flexDirection: "row", justifyContent: "flex-end", mb: 2}}>
-            <Link to="/login">{"Back to login"}</Link>
-            </Box>
           </Box>
         </Box>
       </Zoom>
@@ -365,4 +268,4 @@ const RegisterForm: FC = () => {
   );
 };
 
-export default RegisterForm;
+export default FinishRegistrationForm;

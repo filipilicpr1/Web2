@@ -19,5 +19,6 @@ namespace Contracts.UserDTOs
         public string UserType { get; set; }
         public bool IsVerified { get; set; }
         public string VerificationStatus { get; set; }
+        public bool FinishedRegistration { get; set; }
     }
 }
