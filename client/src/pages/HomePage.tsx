@@ -7,10 +7,8 @@ import LoadingModal from "../components/UI/Modal/LoadingModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getAllProductsAction } from "../store/productsSlice";
 import ProductsList from "../components/Products/ProductsList";
-import { Pagination, Stack, PaginationItem } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { changePage } from "../store/productsSlice";
+import Pagination from "../components/UI/Pagination/Pagination";
 
 const HomePage: FC = () => {
   const navigate = useNavigate();
@@ -25,6 +23,7 @@ const HomePage: FC = () => {
   const shouldRedirect = !finishedRegistration;
   const { id } = jwtDecode<IJwt>(token ? token : "");
   const [gotUser, setGotUser] = useState<boolean>(false);
+  const products = useAppSelector((state) => state.products.products);
   const page = useAppSelector((state) => state.products.page);
   const totalPages = useAppSelector((state) => state.products.totalPages);
   const pageSearch = new URLSearchParams(location.search).get("page");
@@ -32,8 +31,7 @@ const HomePage: FC = () => {
   const [isInitial, setIsInitial] = useState<boolean>(true);
 
   useEffect(() => {
-    if(!isInitial)
-    {
+    if (!isInitial) {
       return;
     }
     setIsInitial(false);
@@ -76,31 +74,13 @@ const HomePage: FC = () => {
   return (
     <>
       <ProductsList />
-      <Stack
-        spacing={2}
-        sx={{
-          mt: 8,
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
+      {products.length > 0 && (
         <Pagination
-          count={totalPages}
-          siblingCount={0}
-          boundaryCount={1}
           page={page}
-          color="primary"
-          size="large"
-          onChange={handleChange}
-          renderItem={(item) => (
-            <PaginationItem
-              slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
-              {...item}
-            />
-          )}
+          totalPages={totalPages}
+          handleChange={handleChange}
         />
-      </Stack>
+      )}
       <LoadingModal
         show={userApiState === "PENDING" || productsApiState === "PENDING"}
       />
