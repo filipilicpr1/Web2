@@ -11,6 +11,7 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import List from "@mui/material/List";
 import { useAppSelector } from "../../../store/hooks";
 import { IUser } from "../../../shared/interfaces/userInterfaces";
@@ -30,6 +31,7 @@ function generateItemsForUser(user: IUser): IItem[] | null {
   items.push({ name: "Products", index: index++ });
 
   if (user.userType === "BUYER") {
+    items.push({ name: "Checkout", index: index++ });
     items.push({ name: "Active orders", index: index++ });
     items.push({ name: "History", index: index++ });
     return items;
@@ -54,6 +56,7 @@ function generateItemsForUser(user: IUser): IItem[] | null {
 
 const icons = new Map<string, React.ReactNode>();
 icons.set("Products", <StorefrontIcon />);
+icons.set("Checkout", <ShoppingCartIcon />);
 icons.set("Active orders", <AccessTimeIcon />);
 icons.set("History", <ReceiptLongIcon />);
 icons.set("New product", <QueueIcon />);

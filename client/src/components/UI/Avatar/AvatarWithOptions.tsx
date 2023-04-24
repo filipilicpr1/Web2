@@ -10,6 +10,8 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { logout } from "../../../store/userSlice";
+import { clearCart } from "../../../store/cartSlice";
+import { clearProducts } from "../../../store/productsSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -45,6 +47,8 @@ const AvatarWithOptions: FC = () => {
 
   const logoutHandler = () => {
     dispatch(logout());
+    dispatch(clearCart());
+    dispatch(clearProducts());
     setAnchorEl(null);
   };
 

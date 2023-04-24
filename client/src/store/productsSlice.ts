@@ -55,7 +55,13 @@ const productsSlice = createSlice({
   reducers: {
     changePage(state, action: PayloadAction<number>) {
         state.page = action.payload;
-      }
+      },
+    clearProducts(state) {
+      state.products = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(addProductAction.pending, (state) => {
@@ -112,5 +118,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const { changePage } = productsSlice.actions;
+export const { changePage, clearProducts } = productsSlice.actions;
 export default productsSlice.reducer;

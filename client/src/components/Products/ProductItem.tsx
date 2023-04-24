@@ -3,6 +3,7 @@ import { IProduct } from "../../shared/interfaces/productsInterfaces";
 import { Grid, Grow } from "@mui/material";
 import StyledCard from "../UI/Styled/StyledCard";
 import ProductCardContent from "./ProductCardContent";
+import AddProductActions from "./AddProductActions";
 
 interface IProps {
   item: IProduct;
@@ -22,10 +23,7 @@ const ProductItem: FC<IProps> = (props) => {
           }}
         >
           <ProductCardContent item={props.item} />
-          {/*<CardActions>
-            <Button size="small">Share</Button>
-            <Button size="small">Learn More</Button>
-  </CardActions> */}
+          <AddProductActions item={props.item} />
         </StyledCard>
       </Grid>
     </Grow>

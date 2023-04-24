@@ -14,9 +14,18 @@ export interface CartState {
 }
 
 const initialState: CartState = {
-  items: [],
-  amount: 0,
-  price: 0,
+  items:
+    localStorage.getItem("cart") !== null
+      ? JSON.parse(localStorage.getItem("cart") as string)
+      : [],
+  amount:
+    localStorage.getItem("cartAmount") !== null
+      ? JSON.parse(localStorage.getItem("cartAmount") as string)
+      : 0,
+  price:
+    localStorage.getItem("cartPrice") !== null
+      ? JSON.parse(localStorage.getItem("cartPrice") as string)
+      : 0,
 };
 
 const cartSlice = createSlice({
@@ -38,8 +47,20 @@ const cartSlice = createSlice({
       state.items.push(newItem);
       state.amount++;
       state.price += action.payload.price;
+      localStorage.setItem("cart", JSON.stringify(state.items));
+      localStorage.setItem("cartAmount", state.amount as unknown as string);
+      localStorage.setItem("cartPrice", state.price as unknown as string);
+    },
+    clearCart(state) {
+        state.items = [];
+        state.amount = 0;
+        state.price = 0;
+        localStorage.removeItem("cart");
+        localStorage.removeItem("cartAmount");
+        localStorage.removeItem("cartPrice");
     }
   },
 });
 
+export const { addToCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
