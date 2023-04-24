@@ -39,9 +39,9 @@ interface IPagedProducts {
 
 export const getAllProductsAction = createAsyncThunk(
   "products/getAll",
-  async (_, thunkApi) => {
+  async (query: string, thunkApi) => {
     try {
-      const response = await GetAllProducts();
+      const response = await GetAllProducts(query);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -52,7 +52,11 @@ export const getAllProductsAction = createAsyncThunk(
 const productsSlice = createSlice({
   name: "products",
   initialState,
-  reducers: {},
+  reducers: {
+    changePage(state, action: PayloadAction<number>) {
+        state.page = action.payload;
+      }
+  },
   extraReducers: (builder) => {
     builder.addCase(addProductAction.pending, (state) => {
       state.apiState = "PENDING";
@@ -108,4 +112,5 @@ const productsSlice = createSlice({
   },
 });
 
+export const { changePage } = productsSlice.actions;
 export default productsSlice.reducer;
