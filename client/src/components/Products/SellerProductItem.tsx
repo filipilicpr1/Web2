@@ -3,13 +3,12 @@ import { IProduct } from "../../shared/interfaces/productsInterfaces";
 import { Grid, Grow } from "@mui/material";
 import StyledCard from "../UI/Styled/StyledCard";
 import ProductCardContent from "./ProductCardContent";
-import AddProductActions from "./AddProductActions";
 
 interface IProps {
   item: IProduct;
 }
 
-const ProductItem: FC<IProps> = (props) => {
+const SellerProductItem: FC<IProps> = (props) => {
   return (
     <Grow in={true}>
       <Grid item xs={3}>
@@ -22,12 +21,11 @@ const ProductItem: FC<IProps> = (props) => {
             backgroundImage: "linear-gradient(147deg, #4d4855 0%, #000000 74%)",
           }}
         >
-          <ProductCardContent item={props.item} showSeller={true} />
-          <AddProductActions item={props.item} />
+          <ProductCardContent item={props.item} showSeller={false} />
         </StyledCard>
       </Grid>
     </Grow>
   );
 };
 
-export default ProductItem;
+export default SellerProductItem;

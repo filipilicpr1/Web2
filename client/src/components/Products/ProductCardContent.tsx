@@ -11,6 +11,7 @@ import { IProduct } from "../../shared/interfaces/productsInterfaces";
 
 interface IProps {
   item: IProduct;
+  showSeller: boolean;
 }
 
 const ProductCardContent: FC<IProps> = (props) => {
@@ -57,7 +58,7 @@ const ProductCardContent: FC<IProps> = (props) => {
             </Typography>
           </Grid>
         </Grid>
-        <Grid
+        {props.showSeller && <Grid
           container
           sx={{ display: "flex", flexDirection: "row-reverse", mt: 2 }}
         >
@@ -81,7 +82,7 @@ const ProductCardContent: FC<IProps> = (props) => {
               {props.item.seller.username}
             </Typography>
           </Grid>
-        </Grid>
+        </Grid>}
       </CardContent>
     </>
   );

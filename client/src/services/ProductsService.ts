@@ -8,3 +8,7 @@ export const AddProduct = async (newProduct: FormData) => {
 export const GetAllProducts = async (query: string) => {
     return await axiosClient.get(`${API}/products${query}`);
 }
+
+export const GetAllProductsBySeller = async (id:string, query: string) => {
+    return await axiosClient.get(`${API}/products/seller/${id}${query}`);
+}
