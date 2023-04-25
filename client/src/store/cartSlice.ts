@@ -13,6 +13,12 @@ export interface CartState {
   price: number;
 }
 
+const storeCart = (state: CartState) => {
+  localStorage.setItem("cart", JSON.stringify(state.items));
+  localStorage.setItem("cartAmount", state.amount as unknown as string);
+  localStorage.setItem("cartPrice", state.price as unknown as string);
+};
+
 const initialState: CartState = {
   items:
     localStorage.getItem("cart") !== null
@@ -36,31 +42,68 @@ const cartSlice = createSlice({
       const item = state.items.find((item) => item.id === action.payload.id);
       if (item) {
         item.amount++;
+      } else {
+        const newItem: IItem = {
+          id: action.payload.id,
+          item: { ...action.payload },
+          amount: 1,
+        };
+        state.items.push(newItem);
       }
-
-      const newItem: IItem = {
-        id: action.payload.id,
-        item: { ...action.payload },
-        amount: 1,
-      };
-
-      state.items.push(newItem);
       state.amount++;
       state.price += action.payload.price;
-      localStorage.setItem("cart", JSON.stringify(state.items));
-      localStorage.setItem("cartAmount", state.amount as unknown as string);
-      localStorage.setItem("cartPrice", state.price as unknown as string);
+      storeCart(state);
     },
     clearCart(state) {
-        state.items = [];
-        state.amount = 0;
-        state.price = 0;
-        localStorage.removeItem("cart");
-        localStorage.removeItem("cartAmount");
-        localStorage.removeItem("cartPrice");
-    }
+      state.items = [];
+      state.amount = 0;
+      state.price = 0;
+      localStorage.removeItem("cart");
+      localStorage.removeItem("cartAmount");
+      localStorage.removeItem("cartPrice");
+    },
+    increase(state, action: PayloadAction<IProduct>) {
+      const item = state.items.find((item) => item.id === action.payload.id);
+      if (!item) {
+        return;
+      }
+
+      item.amount++;
+      state.amount++;
+      state.price += action.payload.price;
+      storeCart(state);
+    },
+    decrease(state, action: PayloadAction<IProduct>) {
+      const item = state.items.find((item) => item.id === action.payload.id);
+      if (!item) {
+        return;
+      }
+
+      item.amount--;
+      state.amount--;
+      state.price -= action.payload.price;
+      if (item.amount === 0) {
+        state.items = state.items.filter(
+          (item) => item.id !== action.payload.id
+        );
+      }
+
+      storeCart(state);
+    },
+    removeItem(state, action: PayloadAction<IProduct>) {
+      const item = state.items.find((item) => item.id === action.payload.id);
+      if (!item) {
+        return;
+      }
+
+      state.items = state.items.filter((item) => item.id !== action.payload.id);
+      state.amount -= item.amount;
+      state.price -= item.amount * action.payload.price;
+      storeCart(state);
+    },
   },
 });
 
-export const { addToCart, clearCart } = cartSlice.actions;
+export const { addToCart, clearCart, increase, decrease, removeItem } =
+  cartSlice.actions;
 export default cartSlice.reducer;

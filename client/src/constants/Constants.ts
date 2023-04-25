@@ -9,3 +9,5 @@ export const defaultErrorMessage: string = "Something went wrong";
 export const drawerWidth: number = 240;
 
 export const registerUserTypes = ["BUYER", "SELLER"];
+
+export const defaultCurrency = " RSD";

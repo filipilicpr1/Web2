@@ -11,6 +11,7 @@ import ChangePasswordPage from "../pages/ChangePasswordPage";
 import NewProductPage from "../pages/NewProductPage";
 import FinishRegistrationPage from "../pages/FinishRegistrationPage";
 import SellerProductsPage from "../pages/SellerProductsPage";
+import CheckoutPage from "../pages/CheckoutPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -18,6 +19,7 @@ const AppRoutes: FC = () => {
   const finishedRegistration = useAppSelector((state) => state.user.finishedRegistration);
   const isVerifiedSeller =
     user && user.userType === "SELLER" && user.isVerified && finishedRegistration;
+  const isBuyer = user && user.userType === "BUYER" && finishedRegistration;
   
 
   return (
@@ -35,6 +37,9 @@ const AppRoutes: FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
+            {isBuyer && (
+              <Route path="/checkout" element={<CheckoutPage />} />
+            )}
             {isVerifiedSeller && (
               <Route path="/new-product" element={<NewProductPage />} />
             )}
