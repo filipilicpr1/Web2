@@ -17,21 +17,35 @@ interface IProps {
 const ProductCardContent: FC<IProps> = (props) => {
   return (
     <>
-      <Box sx={{ height: "200" }}>
+      <Box
+        className={"product-image"}
+        sx={{
+          height: "auto",
+          width: "100%",
+          p: 3,
+          m: "28",
+          position: "relative",
+          display: "inline-block",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{position: "relative", pb: "100%", overflow: "hidden", borderRadius: "25px"}}>
+
         <CardMedia
           component="img"
           image={props.item.imageSource}
-          height="260"
+          height="auto"
           alt="pic"
-          sx={{ borderRadius: "20%", p: 2, m: "28" }}
-        />
+          sx={{ transition: "transform 0.35s ease-in-out", position: "absolute" }}
+          />
+          </Box>
       </Box>
       <CardContent>
         <Typography
           gutterBottom
           variant="h5"
           component="div"
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", width: "200px" }}
         >
           {props.item.name}
         </Typography>
@@ -58,31 +72,37 @@ const ProductCardContent: FC<IProps> = (props) => {
             </Typography>
           </Grid>
         </Grid>
-        {props.showSeller && <Grid
-          container
-          sx={{ display: "flex", flexDirection: "row-reverse", mt: 2 }}
-        >
-          <Grid item xs={3}>
-            <Avatar
-              src={props.item.seller.imageSource}
-              alt="pic"
-              sx={{ mt: 1 }}
-            />
-          </Grid>
+        {props.showSeller && (
           <Grid
-            item
-            xs={9}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-            }}
+            container
+            sx={{ display: "flex", flexDirection: "row-reverse", mt: 2 }}
           >
-            <Typography variant="h6" color="text.primary" sx={{ mt: 2, mr: 1 }}>
-              {props.item.seller.username}
-            </Typography>
+            <Grid item xs={3}>
+              <Avatar
+                src={props.item.seller.imageSource}
+                alt="pic"
+                sx={{ mt: 1 }}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={9}
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Typography
+                variant="h6"
+                color="text.primary"
+                sx={{ mt: 2, mr: 1 }}
+              >
+                {props.item.seller.username}
+              </Typography>
+            </Grid>
           </Grid>
-        </Grid>}
+        )}
       </CardContent>
     </>
   );

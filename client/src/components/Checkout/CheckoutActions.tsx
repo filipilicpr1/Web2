@@ -18,9 +18,9 @@ const CheckoutActions: FC = () => {
           onClick={clearHandler}
           sx={{
             width: "70%",
-            borderRadius: "20%",
-            bgcolor: "#c62128",
-            backgroundImage: "linear-gradient(147deg, #c62128 0%, #a00000 74%)",
+            borderRadius: "25px",
+            bgcolor: "#990000",
+            backgroundImage: "linear-gradient(147deg, #990000 0%, #ff0000 74%)",
             ml: 11,
           }}
         >
@@ -40,7 +40,7 @@ const CheckoutActions: FC = () => {
           onClick={() => {}}
           sx={{
             width: "70%",
-            borderRadius: "20%",
+            borderRadius: "25px",
             bgcolor: "#0cbaba",
             backgroundImage: "linear-gradient(315deg, #0cbaba 0%, #380036 74%)",
             mr: 11,

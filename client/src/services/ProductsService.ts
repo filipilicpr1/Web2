@@ -12,3 +12,7 @@ export const GetAllProducts = async (query: string) => {
 export const GetAllProductsBySeller = async (id:string, query: string) => {
     return await axiosClient.get(`${API}/products/seller/${id}${query}`);
 }
+
+export const DeleteProduct = async (id:string) => {
+    return await axiosClient.delete(`${API}/products/${id}`);
+}

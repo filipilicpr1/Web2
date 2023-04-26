@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { AddProduct, GetAllProducts, GetAllProductsBySeller } from "../services/ProductsService";
+import {
+  AddProduct,
+  GetAllProducts,
+  GetAllProductsBySeller,
+  DeleteProduct,
+} from "../services/ProductsService";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
 import { defaultErrorMessage } from "../constants/Constants";
@@ -34,9 +39,9 @@ export const addProductAction = createAsyncThunk(
 );
 
 interface IPagedProducts {
-    items: IProduct[],
-    page: number,
-    totalPages: number
+  items: IProduct[];
+  page: number;
+  totalPages: number;
 }
 
 export const getAllProductsAction = createAsyncThunk(
@@ -52,8 +57,8 @@ export const getAllProductsAction = createAsyncThunk(
 );
 
 interface IGetBySeller {
-  id: string,
-  query: string
+  id: string;
+  query: string;
 }
 
 export const getAllProductsBySellerAction = createAsyncThunk(
@@ -68,19 +73,31 @@ export const getAllProductsBySellerAction = createAsyncThunk(
   }
 );
 
+export const deleteProductAction = createAsyncThunk(
+  "products/delete",
+  async (id: string, thunkApi) => {
+    try {
+      const response = await DeleteProduct(id);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const productsSlice = createSlice({
   name: "products",
   initialState,
   reducers: {
     changePage(state, action: PayloadAction<number>) {
-        state.page = action.payload;
-      },
+      state.page = action.payload;
+    },
     clearProducts(state) {
       state.products = [];
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
-    }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(addProductAction.pending, (state) => {
@@ -112,54 +129,88 @@ const productsSlice = createSlice({
     });
 
     builder.addCase(getAllProductsAction.pending, (state) => {
-        state.apiState = "PENDING";
-      });
-      builder.addCase(getAllProductsAction.fulfilled, (state, action: PayloadAction<IPagedProducts>) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getAllProductsAction.fulfilled,
+      (state, action: PayloadAction<IPagedProducts>) => {
         state.apiState = "COMPLETED";
         state.products = [...action.payload.items];
         state.sellerProducts = [];
         state.page = action.payload.page;
         state.totalPages = action.payload.totalPages;
-      });
-      builder.addCase(getAllProductsAction.rejected, (state, action) => {
-        state.apiState = "REJECTED";
-        let error: string = defaultErrorMessage;
-        if (typeof action.payload === "string") {
-          error = action.payload;
-        }
-  
-        toast.error(error, {
-          position: "top-center",
-          autoClose: 2500,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
-      });
+      }
+    );
+    builder.addCase(getAllProductsAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
 
-      builder.addCase(getAllProductsBySellerAction.pending, (state) => {
-        state.apiState = "PENDING";
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
       });
-      builder.addCase(getAllProductsBySellerAction.fulfilled, (state, action: PayloadAction<IPagedProducts>) => {
+    });
+
+    builder.addCase(getAllProductsBySellerAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getAllProductsBySellerAction.fulfilled,
+      (state, action: PayloadAction<IPagedProducts>) => {
         state.apiState = "COMPLETED";
         state.sellerProducts = [...action.payload.items];
         state.products = [];
         state.page = action.payload.page;
         state.totalPages = action.payload.totalPages;
+      }
+    );
+    builder.addCase(getAllProductsBySellerAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
       });
-      builder.addCase(getAllProductsBySellerAction.rejected, (state, action) => {
-        state.apiState = "REJECTED";
-        let error: string = defaultErrorMessage;
-        if (typeof action.payload === "string") {
-          error = action.payload;
-        }
-  
-        toast.error(error, {
-          position: "top-center",
-          autoClose: 2500,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
+    });
+
+    builder.addCase(deleteProductAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(deleteProductAction.fulfilled, (state) => {
+      state.apiState = "COMPLETED";
+
+      toast.success("Product has been deleted", {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
       });
+    });
+    builder.addCase(deleteProductAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
   },
 });
 

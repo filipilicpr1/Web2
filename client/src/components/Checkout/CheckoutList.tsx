@@ -34,7 +34,7 @@ const CheckoutList: FC = () => {
             sx={{
               mt: 4,
               p: 4,
-              borderRadius: "20px",
+              borderRadius: "25px",
               width: "100%",
               backgroundColor: "#2d3436",
               backgroundImage:

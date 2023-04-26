@@ -16,14 +16,17 @@ const ProductItem: FC<IProps> = (props) => {
         <StyledCard
           sx={{
             m: 2,
-            borderRadius: "10%",
+            borderRadius: "25px",
             width: "300",
             backgroundColor: "#4d4855",
             backgroundImage: "linear-gradient(147deg, #4d4855 0%, #000000 74%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
           }}
         >
-          <ProductCardContent item={props.item} showSeller={true} />
           <AddProductActions item={props.item} />
+          <ProductCardContent item={props.item} showSeller={true} />
         </StyledCard>
       </Grid>
     </Grow>

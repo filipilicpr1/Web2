@@ -21,7 +21,7 @@ const CheckoutItemContent: FC<IProps> = (props) => {
       <Card
         sx={{
           m: 2,
-          borderRadius: "10%",
+          borderRadius: "25px",
           width: "100%",
           backgroundColor: "#4d4855",
           backgroundImage: "linear-gradient(147deg, #4d4855 0%, #000000 74%)",
@@ -34,7 +34,7 @@ const CheckoutItemContent: FC<IProps> = (props) => {
             component="img"
             image={props.item.imageSource}
             alt="pic"
-            sx={{ borderRadius: "20%", p: 2, height: "200px" }}
+            sx={{ borderRadius: "25px", p: 2, height: "200px" }}
           />
         </Box>
         <CardContent>

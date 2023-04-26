@@ -60,7 +60,7 @@ const CheckoutItemActions: FC<IProps> = (props) => {
           onClick={decreaseHandler}
           sx={{
             width: "40%",
-            borderRadius: "30%",
+            borderRadius: "25px",
             bgcolor: "#a40606",
             backgroundImage: "linear-gradient(315deg, #a40606 0%, #d98324 74%)",
             ml: 4,
@@ -74,9 +74,9 @@ const CheckoutItemActions: FC<IProps> = (props) => {
           onClick={increaseHandler}
           sx={{
             width: "40%",
-            borderRadius: "30%",
-            bgcolor: "#00b712",
-            backgroundImage: "linear-gradient(315deg, #00b712 0%, #5aff15 74%)",
+            borderRadius: "25px",
+            bgcolor: "#015d00",
+            backgroundImage: "linear-gradient(314deg, #015d00 0%, #04bf00 74%)",
             ml: 2,
           }}
         >
@@ -87,9 +87,9 @@ const CheckoutItemActions: FC<IProps> = (props) => {
         onClick={removeItemHandler}
         sx={{
           width: "85%",
-          borderRadius: "20%",
-          bgcolor: "#c62128",
-          backgroundImage: "linear-gradient(147deg, #c62128 0%, #a00000 74%)",
+          borderRadius: "25px",
+          bgcolor: "#990000",
+          backgroundImage: "linear-gradient(147deg, #990000 0%, #ff0000 74%)",
           ml: 4,
           mt: 2,
         }}

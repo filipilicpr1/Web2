@@ -22,7 +22,7 @@ const CheckoutItem: FC<IProps> = (props) => {
           sx={{
             m: 2,
             ml: 11,
-            borderRadius: "10%",
+            borderRadius: "25px",
             width: "100%",
             backgroundColor: "#000000",
             backgroundImage: "linear-gradient(315deg, #000000 0%, #7f8c8d 74%)",

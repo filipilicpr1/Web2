@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { CardActions, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { IProduct } from "../../shared/interfaces/productsInterfaces";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addToCart } from "../../store/cartSlice";
@@ -21,20 +21,24 @@ const AddProductActions: FC<IProps> = (props) => {
   return (
     <>
       {userIsBuyer && (
-        <CardActions sx={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
-          <StyledButton
-            onClick={handleAdd}
-            sx={{
-              width: "90%",
-              borderRadius: "30%",
-              bgcolor: "#bdd4e7",
-              backgroundImage:
-                "linear-gradient(315deg, #bdd4e7 0%, #8693ab 74%)",
-            }}
-          >
-            <Typography fontWeight={"bold"}>ADD TO CART</Typography>
-          </StyledButton>
-        </CardActions>
+        <StyledButton
+          onClick={handleAdd}
+          sx={{
+            width: "80%",
+            borderRadius: "25px",
+            bgcolor: "#bdd4e7",
+            backgroundImage: "linear-gradient(315deg, #bdd4e7 0%, #8693ab 74%)",
+            order: 3,
+            mb: 2,
+            "&:hover": {
+              "&+.product-image img": {
+                transform: "scale3d(1.09, 1.09, 1)",
+              },
+            },
+          }}
+        >
+          <Typography fontWeight={"bold"}>ADD TO CART</Typography>
+        </StyledButton>
       )}
     </>
   );
