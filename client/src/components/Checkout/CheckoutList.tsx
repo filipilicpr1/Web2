@@ -15,6 +15,7 @@ import { defaultCurrency } from "../../constants/Constants";
 import { createOrderAction } from "../../store/ordersSlice";
 import { ICreateOrder } from "../../shared/interfaces/orderInterfaces";
 import { useNavigate } from "react-router-dom";
+import { clearCart } from "../../store/cartSlice";
 
 const CheckoutList: FC = () => {
   const navigate = useNavigate();
@@ -58,8 +59,9 @@ const CheckoutList: FC = () => {
     if (!(apiState === "COMPLETED")) {
       return;
     }
+    dispatch(clearCart());
     navigate("/active-orders"); // navigate to order page
-  }, [apiState, navigate, requestSent]);
+  }, [apiState, navigate, requestSent, dispatch]);
 
   return (
     <>
