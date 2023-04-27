@@ -6,6 +6,7 @@ import { getAllProductsBySellerAction } from "../store/productsSlice";
 import { changePage } from "../store/productsSlice";
 import Pagination from "../components/UI/Pagination/Pagination";
 import SellerProductsList from "../components/Products/SellerProductsList";
+import { clearSellerProducts } from "../store/productsSlice";
 
 const SellerProductsPage: FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,12 @@ const SellerProductsPage: FC = () => {
   const pageSearch = new URLSearchParams(location.search).get("page");
   const currentPage: number = pageSearch !== null ? parseInt(pageSearch) : 1;
   const [isInitial, setIsInitial] = useState<boolean>(true);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearSellerProducts());
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (!isInitial) {

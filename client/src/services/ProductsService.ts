@@ -16,3 +16,11 @@ export const GetAllProductsBySeller = async (id:string, query: string) => {
 export const DeleteProduct = async (id:string) => {
     return await axiosClient.delete(`${API}/products/${id}`);
 }
+
+export const GetProductById = async (id: string) => {
+    return await axiosClient.get(`${API}/products/${id}`);
+}
+
+export const UpdateProduct = async (id: string, product: FormData) => {
+    return await axiosClient.put(`${API}/products/${id}`, product);
+}

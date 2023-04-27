@@ -12,15 +12,20 @@ import NewProductPage from "../pages/NewProductPage";
 import FinishRegistrationPage from "../pages/FinishRegistrationPage";
 import SellerProductsPage from "../pages/SellerProductsPage";
 import CheckoutPage from "../pages/CheckoutPage";
+import EditProductPage from "../pages/EditProductPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
   const user = useAppSelector((state) => state.user.user);
-  const finishedRegistration = useAppSelector((state) => state.user.finishedRegistration);
+  const finishedRegistration = useAppSelector(
+    (state) => state.user.finishedRegistration
+  );
   const isVerifiedSeller =
-    user && user.userType === "SELLER" && user.isVerified && finishedRegistration;
+    user &&
+    user.userType === "SELLER" &&
+    user.isVerified &&
+    finishedRegistration;
   const isBuyer = user && user.userType === "BUYER" && finishedRegistration;
-  
 
   return (
     <BrowserRouter>
@@ -37,22 +42,32 @@ const AppRoutes: FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
-            {isBuyer && (
-              <Route path="/checkout" element={<CheckoutPage />} />
-            )}
+            {isBuyer && <Route path="/checkout" element={<CheckoutPage />} />}
             {isVerifiedSeller && (
               <Route path="/new-product" element={<NewProductPage />} />
             )}
             {isVerifiedSeller && (
               <Route path="/my-products" element={<SellerProductsPage />} />
             )}
+            {isVerifiedSeller && (
+              <Route
+                path="/my-products/:productId/edit"
+                element={<EditProductPage />}
+              />
+            )}
             <Route path="*" element={<Navigate replace to={"/"} />} />
           </Route>
         )}
         {isLoggedIn && !finishedRegistration && (
           <Route element={<AppLayout />}>
-            <Route path="/finish-registration" element={<FinishRegistrationPage />} />
-            <Route path="*" element={<Navigate replace to={"/finish-registration"} />} />
+            <Route
+              path="/finish-registration"
+              element={<FinishRegistrationPage />}
+            />
+            <Route
+              path="*"
+              element={<Navigate replace to={"/finish-registration"} />}
+            />
           </Route>
         )}
       </Routes>

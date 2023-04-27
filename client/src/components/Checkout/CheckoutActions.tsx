@@ -1,11 +1,25 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import StyledButton from "../UI/Styled/StyledButton";
 import { Grid, Typography } from "@mui/material";
 import { useAppDispatch } from "../../store/hooks";
 import { clearCart } from "../../store/cartSlice";
+import CheckoutModal from "./CheckoutModal";
 
-const CheckoutActions: FC = () => {
+interface IProps {
+  onOrder: (deliveryAddress: string, comment: string) => void
+}
+
+const CheckoutActions: FC<IProps> = (props) => {
   const dispatch = useAppDispatch();
+  const [open, setOpen] = useState(false);
+
+  const closeHandler = () => {
+    setOpen(false);
+  };
+
+  const openHandler = () => {
+    setOpen(true);
+  };
 
   const clearHandler = () => {
     dispatch(clearCart());
@@ -37,7 +51,7 @@ const CheckoutActions: FC = () => {
         }}
       >
         <StyledButton
-          onClick={() => {}}
+          onClick={openHandler}
           sx={{
             width: "70%",
             borderRadius: "25px",
@@ -48,6 +62,7 @@ const CheckoutActions: FC = () => {
         >
           <Typography fontWeight={"bold"}>ORDER</Typography>
         </StyledButton>
+        <CheckoutModal open={open} handleClose={closeHandler} handleSubmit={props.onOrder} />
       </Grid>
     </Grid>
   );

@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Grid,
   Card,
@@ -8,14 +8,23 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import CheckoutItem from "./CheckoutItem";
 import CheckoutActions from "./CheckoutActions";
 import { defaultCurrency } from "../../constants/Constants";
+import { createOrderAction } from "../../store/ordersSlice";
+import { ICreateOrder } from "../../shared/interfaces/orderInterfaces";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutList: FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.cart.items);
+  const user = useAppSelector((state) => state.user.user);
+  const id = user !== null ? user.id : "";
+  const apiState = useAppSelector((state) => state.orders.apiState);
   const cartTotal = useAppSelector((state) => state.cart.price);
+  const [requestSent, setRequestSent] = useState<boolean>(false);
   const content = items.map((item) => {
     return (
       <CheckoutItem
@@ -26,6 +35,32 @@ const CheckoutList: FC = () => {
       />
     );
   });
+
+  const createOrder = (deliveryAddress: string, comment: string) => {
+    const data: ICreateOrder = {
+      buyerId: id,
+      deliveryAddress: deliveryAddress,
+      comment: comment,
+      orderProducts: items.map((item) => {
+        return { productId: item.item.id, amount: item.amount };
+      }),
+    };
+    
+    dispatch(createOrderAction(data));
+    setRequestSent(true);
+  };
+
+  useEffect(() => {
+    if (!requestSent) {
+      return;
+    }
+
+    if (!(apiState === "COMPLETED")) {
+      return;
+    }
+    navigate("/active-orders"); // navigate to order page
+  }, [apiState, navigate, requestSent]);
+
   return (
     <>
       {items.length > 0 && (
@@ -52,18 +87,25 @@ const CheckoutList: FC = () => {
             <Grid
               sx={{ display: "flex", flexDirection: "row-reverse", mr: 10 }}
             >
-              <TextField
-                id="price"
-                name="price"
-                disabled
-                value={cartTotal + defaultCurrency}
-                sx={{
-                  backgroundColor: "#4d4855",
-                  backgroundImage:
-                    "linear-gradient(147deg, #4d4855 0%, #000000 74%)",
-                  m: 1,
-                }}
-              />
+              <Box sx={{ display: "flex", flexDirection: "column-reverse" }}>
+                <InputLabel htmlFor="price" sx={{ ml: 2, mt: -1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    * Delivery fee not included
+                  </Typography>
+                </InputLabel>
+                <TextField
+                  id="price"
+                  name="price"
+                  disabled
+                  value={cartTotal + defaultCurrency}
+                  sx={{
+                    backgroundColor: "#4d4855",
+                    backgroundImage:
+                      "linear-gradient(147deg, #4d4855 0%, #000000 74%)",
+                    m: 1,
+                  }}
+                />
+              </Box>
               <Box
                 sx={{
                   borderRadius: "5px",
@@ -81,7 +123,7 @@ const CheckoutList: FC = () => {
                 </InputLabel>
               </Box>
             </Grid>
-            <CheckoutActions />
+            <CheckoutActions onOrder={createOrder} />
           </Card>
         </Grow>
       )}

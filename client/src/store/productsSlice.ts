@@ -4,6 +4,8 @@ import {
   GetAllProducts,
   GetAllProductsBySeller,
   DeleteProduct,
+  GetProductById,
+  UpdateProduct,
 } from "../services/ProductsService";
 import { toast } from "react-toastify";
 import { ApiCallState } from "../shared/types/enumerations";
@@ -13,6 +15,7 @@ import { IProduct } from "../shared/interfaces/productsInterfaces";
 export interface ProductsState {
   products: IProduct[];
   sellerProducts: IProduct[];
+  editProduct: IProduct | null;
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -21,6 +24,7 @@ export interface ProductsState {
 const initialState: ProductsState = {
   products: [],
   sellerProducts: [],
+  editProduct: null,
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -85,6 +89,35 @@ export const deleteProductAction = createAsyncThunk(
   }
 );
 
+export const getProductByIdAction = createAsyncThunk(
+  "products/getById",
+  async (id: string, thunkApi) => {
+    try {
+      const response = await GetProductById(id);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+interface IUpdateProduct {
+  id: string;
+  data: FormData;
+}
+
+export const updateProductAction = createAsyncThunk(
+  "products/update",
+  async (data: IUpdateProduct, thunkApi) => {
+    try {
+      const response = await UpdateProduct(data.id, data.data);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const productsSlice = createSlice({
   name: "products",
   initialState,
@@ -97,6 +130,15 @@ const productsSlice = createSlice({
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
+    },
+    clearSellerProducts(state) {
+      state.sellerProducts = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearEditProduct(state) {
+      state.editProduct = null;
     },
   },
   extraReducers: (builder) => {
@@ -211,8 +253,70 @@ const productsSlice = createSlice({
         pauseOnHover: false,
       });
     });
+
+    builder.addCase(getProductByIdAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getProductByIdAction.fulfilled,
+      (state, action: PayloadAction<IProduct>) => {
+        state.apiState = "COMPLETED";
+        state.editProduct = { ...action.payload };
+      }
+    );
+    builder.addCase(getProductByIdAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(updateProductAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      updateProductAction.fulfilled,
+      (state, action: PayloadAction<IProduct>) => {
+        state.apiState = "COMPLETED";
+        state.editProduct = { ...action.payload };
+
+        toast.success("Product has been updated", {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
+    builder.addCase(updateProductAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
   },
 });
 
-export const { changePage, clearProducts } = productsSlice.actions;
+export const {
+  changePage,
+  clearProducts,
+  clearEditProduct,
+  clearSellerProducts,
+} = productsSlice.actions;
 export default productsSlice.reducer;

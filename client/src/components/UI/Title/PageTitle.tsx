@@ -1,9 +1,13 @@
-import React, { FC } from "react";
+import React, {FC} from 'react';
 import { Box, Typography, Slide } from "@mui/material";
 
-const ProfileTitle: FC = () => {
-  return (
-    <Box sx={{ width: "1430px", marginLeft: "-10rem" }}>
+interface IProps {
+    title: string
+}
+
+const PageTitle: FC<IProps> = (props) => {
+    return (
+        <Box sx={{ width: "100%", marginLeft: "0 auto" }}>
       <Slide direction="down" in={true} mountOnEnter unmountOnExit>
         <Box
           mb={2}
@@ -18,12 +22,12 @@ const ProfileTitle: FC = () => {
           }}
         >
           <Typography component="h2" variant="h2" fontFamily={"cursive"}>
-            My Profile
+            {props.title}
           </Typography>
         </Box>
       </Slide>
     </Box>
-  );
-};
+    );
+}
 
-export default ProfileTitle;
+export default PageTitle;

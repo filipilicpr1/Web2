@@ -7,7 +7,7 @@ import LoadingModal from "../components/UI/Modal/LoadingModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getAllProductsAction } from "../store/productsSlice";
 import ProductsList from "../components/Products/ProductsList";
-import { changePage } from "../store/productsSlice";
+import { changePage, clearProducts } from "../store/productsSlice";
 import Pagination from "../components/UI/Pagination/Pagination";
 
 const HomePage: FC = () => {
@@ -29,6 +29,12 @@ const HomePage: FC = () => {
   const pageSearch = new URLSearchParams(location.search).get("page");
   const currentPage: number = pageSearch !== null ? parseInt(pageSearch) : 1;
   const [isInitial, setIsInitial] = useState<boolean>(true);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearProducts());
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (!isInitial) {
