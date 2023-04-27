@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 
 const MyStyledCard = styled(Card)(({ theme }) => ({
   transition: "transform 0.35s ease-in-out",
-  "&:hover": { transform: "scale3d(1, 1, 1)" },
+  "&:hover": { transform: "scale3d(1.09, 1.09, 1)" },
 }));
 
 interface IProps {

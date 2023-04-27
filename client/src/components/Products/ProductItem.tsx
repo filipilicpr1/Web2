@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import { IProduct } from "../../shared/interfaces/productsInterfaces";
-import { Grid, Grow } from "@mui/material";
-import StyledCard from "../UI/Styled/StyledCard";
+import { Grid, Grow, Card } from "@mui/material";
 import ProductCardContent from "./ProductCardContent";
 import AddProductActions from "./AddProductActions";
 
@@ -13,7 +12,7 @@ const ProductItem: FC<IProps> = (props) => {
   return (
     <Grow in={true}>
       <Grid item xs={3}>
-        <StyledCard
+        <Card
           sx={{
             m: 2,
             borderRadius: "25px",
@@ -27,7 +26,7 @@ const ProductItem: FC<IProps> = (props) => {
         >
           <AddProductActions item={props.item} />
           <ProductCardContent item={props.item} showSeller={true} />
-        </StyledCard>
+        </Card>
       </Grid>
     </Grow>
   );

@@ -3,8 +3,8 @@ import { IProduct } from "../../shared/interfaces/productsInterfaces";
 import {
   Grid,
   Grow,
+  Card
 } from "@mui/material";
-import StyledCard from "../UI/Styled/StyledCard";
 import CheckoutItemContent from "./CheckoutItemContent";
 import CheckoutItemActions from "./CheckoutItemActions";
 
@@ -18,7 +18,7 @@ const CheckoutItem: FC<IProps> = (props) => {
   return (
     <Grow in={true} mountOnEnter unmountOnExit>
       <Grid item xs={10}>
-        <StyledCard
+        <Card
           sx={{
             m: 2,
             ml: 11,
@@ -33,7 +33,7 @@ const CheckoutItem: FC<IProps> = (props) => {
         >
           <CheckoutItemContent item={props.item} />
           <CheckoutItemActions item={props.item} amount={props.amount} />
-        </StyledCard>
+        </Card>
       </Grid>
     </Grow>
   );

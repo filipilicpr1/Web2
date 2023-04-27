@@ -1,7 +1,6 @@
 import React, { FC, useState } from "react";
 import { IProduct } from "../../shared/interfaces/productsInterfaces";
-import { Grid, Grow } from "@mui/material";
-import StyledCard from "../UI/Styled/StyledCard";
+import { Grid, Grow, Card } from "@mui/material";
 import ProductCardContent from "./ProductCardContent";
 import SellerDeleteAction from "./SellerDeleteAction";
 import SellerEditAction from "./SellerEditAction";
@@ -25,7 +24,7 @@ const SellerProductItem: FC<IProps> = (props) => {
   return (
     <Grow in={true}>
       <Grid item xs={3}>
-        <StyledCard
+        <Card
           sx={{
             m: 2,
             borderRadius: "25px",
@@ -41,7 +40,7 @@ const SellerProductItem: FC<IProps> = (props) => {
           <SellerDeleteAction item={props.item} handleClick={handleOpen} />
           <ProductCardContent item={props.item} showSeller={false} />
           <SellerDeleteModal item={props.item} open={open} handleClose={handleClose} />
-        </StyledCard>
+        </Card>
       </Grid>
     </Grow>
   );

@@ -34,10 +34,10 @@ const CheckoutItemContent: FC<IProps> = (props) => {
             component="img"
             image={props.item.imageSource}
             alt="pic"
-            sx={{ borderRadius: "25px", p: 2, height: "200px" }}
+            sx={{ borderRadius: "50px", p: 3, height: "200px" }}
           />
         </Box>
-        <CardContent>
+        <CardContent sx={{mt: 0.5}}>
           <Typography
             gutterBottom
             variant="h5"
