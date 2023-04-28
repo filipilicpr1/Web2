@@ -8,8 +8,8 @@ namespace Domain.Enums
 {
     public enum OrderStatuses
     {
-        InProgress,
-        Delivered,
-        Canceled
+        ONGOING,
+        DELIVERED,
+        CANCELED
     }
 }
