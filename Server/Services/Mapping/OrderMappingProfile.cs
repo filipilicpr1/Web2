@@ -30,9 +30,9 @@ namespace Services.Mapping
 
         private string GetOrderStatus(Order order)
         {
-            return order.IsCanceled ? OrderStatuses.Canceled.ToString() 
-                                    : order.DeliveryTime > DateTime.Now ? OrderStatuses.InProgress.ToString()
-                                                                        : OrderStatuses.Delivered.ToString();
+            return order.IsCanceled ? OrderStatuses.CANCELED.ToString() 
+                                    : order.DeliveryTime > DateTime.Now ? OrderStatuses.ONGOING.ToString()
+                                                                        : OrderStatuses.DELIVERED.ToString();
         }
     }
 }
