@@ -23,7 +23,7 @@ namespace Persistence.Repositories
                                                                .ThenInclude(op => op.Product)
                                                                .ThenInclude(p => p.Seller)
                                                                .Where(o => o.DeliveryTime < DateTime.Now)
-                                                               .OrderBy(o => o.OrderTime)
+                                                               .OrderByDescending(o => o.OrderTime)
                                                                .ToListAsync();
             return orders.FindAll(o => o.OrderProducts.FindAll(op => op.Product.SellerId == id).Count != 0);
         }
@@ -37,7 +37,7 @@ namespace Persistence.Repositories
                                                                .Where(o => o.Buyer.Id == id &&
                                                                            o.DeliveryTime < DateTime.Now &&
                                                                            !o.IsCanceled)
-                                                               .OrderBy(o => o.OrderTime)
+                                                               .OrderByDescending(o => o.OrderTime)
                                                                .ToListAsync();
             return orders;
         }
@@ -86,7 +86,7 @@ namespace Persistence.Repositories
                                                                .Include(o => o.OrderProducts)
                                                                .ThenInclude(op => op.Product)
                                                                .ThenInclude(p => p.Seller)
-                                                               .OrderBy(o => o.OrderTime)
+                                                               .OrderByDescending(o => o.OrderTime)
                                                                .ToListAsync();
             return orders;
         }
