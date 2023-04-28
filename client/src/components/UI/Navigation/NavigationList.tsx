@@ -28,7 +28,7 @@ function generateItemsForUser(user: IUser): IItem[] | null {
   }
   let index = 0;
   let items: IItem[] = [];
-  items.push({ name: "Products", index: index++ });
+  items.push({ name: "", index: index++ });
 
   if (user.userType === "BUYER") {
     items.push({ name: "Checkout", index: index++ });
@@ -55,7 +55,7 @@ function generateItemsForUser(user: IUser): IItem[] | null {
 }
 
 const icons = new Map<string, React.ReactNode>();
-icons.set("Products", <StorefrontIcon />);
+icons.set("", <StorefrontIcon />);
 icons.set("Checkout", <ShoppingCartIcon />);
 icons.set("Active orders", <AccessTimeIcon />);
 icons.set("History", <ReceiptLongIcon />);
@@ -118,6 +118,7 @@ const NavigationList: FC = () => {
       (item) => "/" + item.name.toLowerCase().replace(" ", "-") === pathname
     );
     if (filteredItems.length === 0) {
+      setSelectedIndex(-1);
       return;
     }
 

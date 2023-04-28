@@ -13,6 +13,7 @@ import FinishRegistrationPage from "../pages/FinishRegistrationPage";
 import SellerProductsPage from "../pages/SellerProductsPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import EditProductPage from "../pages/EditProductPage";
+import MyOrdersPage from "../pages/MyOrdersPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -54,6 +55,9 @@ const AppRoutes: FC = () => {
                 path="/my-products/:productId/edit"
                 element={<EditProductPage />}
               />
+            )}
+            {isVerifiedSeller && (
+              <Route path="/my-orders" element={<MyOrdersPage />} />
             )}
             <Route path="*" element={<Navigate replace to={"/"} />} />
           </Route>

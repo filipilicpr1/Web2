@@ -1,5 +1,6 @@
 import { IUserMinimal } from "./userInterfaces"
 import { IProduct } from "./productsInterfaces"
+import { OrderStatuses } from "../types/enumerations"
 
 export interface IOrderProduct {
     productId: string,
@@ -22,6 +23,6 @@ export interface IOrder {
     orderTime: string,
     deliveryTime: string,
     isCanceled: boolean,
-    status: string,
+    status: OrderStatuses,
     orderProducts: IProduct[]
 }
