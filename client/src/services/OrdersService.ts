@@ -9,3 +9,7 @@ export const CreateOrder = async (data: ICreateOrder) => {
 export const GetDeliveredOrCanceledOrdersBySeller = async (id:string, query: string) => {
     return await axiosClient.get(`${API}/orders/seller/${id}/delivered-or-canceled${query}`);
 }
+
+export const GetAllOrders = async (query: string) => {
+    return await axiosClient.get(`${API}/orders${query}`);
+}

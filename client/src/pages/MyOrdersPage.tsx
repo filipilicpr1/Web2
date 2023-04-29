@@ -53,7 +53,7 @@ const MyOrdersPage: FC = () => {
 
     return (
         <>
-            <OrdersList />
+            <OrdersList orders={sellerDeliveredOrders} />
             {sellerDeliveredOrders.length > 0 && (
                 <Pagination
                     page={page}

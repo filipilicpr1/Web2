@@ -20,7 +20,7 @@ const OrderProductsList: FC<IProps> = (props) => {
               }}
             >
               {props.items.map((product) => (
-                <Badge badgeContent={product.amount} color="primary" sx={{}}>
+                <Badge key={product.id} badgeContent={product.amount} color="primary" sx={{}}>
                   <Tooltip title={product.name}>
                     <Avatar
                       alt="pic"

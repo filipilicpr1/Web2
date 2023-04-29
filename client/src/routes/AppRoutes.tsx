@@ -14,6 +14,7 @@ import SellerProductsPage from "../pages/SellerProductsPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import EditProductPage from "../pages/EditProductPage";
 import MyOrdersPage from "../pages/MyOrdersPage";
+import AllOrdersPage from "../pages/AllOrdersPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -27,6 +28,7 @@ const AppRoutes: FC = () => {
     user.isVerified &&
     finishedRegistration;
   const isBuyer = user && user.userType === "BUYER" && finishedRegistration;
+  const isAdmin = user && user.userType === "ADMIN" && finishedRegistration;
 
   return (
     <BrowserRouter>
@@ -58,6 +60,9 @@ const AppRoutes: FC = () => {
             )}
             {isVerifiedSeller && (
               <Route path="/my-orders" element={<MyOrdersPage />} />
+            )}
+            {isAdmin && (
+              <Route path="/all-orders" element={<AllOrdersPage />} />
             )}
             <Route path="*" element={<Navigate replace to={"/"} />} />
           </Route>

@@ -14,6 +14,7 @@ import OrderProductsList from "./OrderProductsList";
 interface IProps {
   item: IOrder;
   sellerId: string;
+  userIsSeller: boolean;
 }
 
 const OrderItem: FC<IProps> = (props) => {
@@ -54,7 +55,7 @@ const OrderItem: FC<IProps> = (props) => {
             >
               {props.item.buyer.name + " " + props.item.buyer.lastName}
             </Typography>
-            <OrderProductsList items={props.item.orderProducts} sellerId={props.sellerId} />
+            <OrderProductsList items={props.item.orderProducts} sellerId={props.userIsSeller ? props.sellerId : ""}/>
             <Typography variant="h6" mt={2}>
               {"Total: " + props.item.price}
             </Typography>

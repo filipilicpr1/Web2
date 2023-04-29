@@ -6,10 +6,12 @@ import { ICreateOrder, IOrder } from "../shared/interfaces/orderInterfaces";
 import {
   CreateOrder,
   GetDeliveredOrCanceledOrdersBySeller,
+  GetAllOrders
 } from "../services/OrdersService";
 
 export interface OrdersState {
   sellerDeliveredOrders: IOrder[];
+  allOrders: IOrder[];
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -17,6 +19,7 @@ export interface OrdersState {
 
 const initialState: OrdersState = {
   sellerDeliveredOrders: [],
+  allOrders: [],
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -60,6 +63,18 @@ export const getDeliveredOrCanceledBySellerAction = createAsyncThunk(
   }
 );
 
+export const getAllOrdersAction = createAsyncThunk(
+  "orders/getAll",
+  async (query: string, thunkApi) => {
+    try {
+      const response = await GetAllOrders(query);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
@@ -69,6 +84,12 @@ const ordersSlice = createSlice({
     },
     clearSellerDeliveredOrders(state) {
       state.sellerDeliveredOrders = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearAllOrders(state) {
+      state.allOrders = [];
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
@@ -135,8 +156,38 @@ const ordersSlice = createSlice({
         });
       }
     );
+
+    builder.addCase(getAllOrdersAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getAllOrdersAction.fulfilled,
+      (state, action: PayloadAction<IPagedOrders>) => {
+        state.apiState = "COMPLETED";
+        state.allOrders = [...action.payload.items];
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
+      }
+    );
+    builder.addCase(
+      getAllOrdersAction.rejected,
+      (state, action) => {
+        state.apiState = "REJECTED";
+        let error: string = defaultErrorMessage;
+        if (typeof action.payload === "string") {
+          error = action.payload;
+        }
+
+        toast.error(error, {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
   },
 });
 
-export const { changePage, clearSellerDeliveredOrders } = ordersSlice.actions;
+export const { changePage, clearSellerDeliveredOrders, clearAllOrders } = ordersSlice.actions;
 export default ordersSlice.reducer;
