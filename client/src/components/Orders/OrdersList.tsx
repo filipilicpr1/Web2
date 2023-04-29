@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import { useAppSelector } from "../../store/hooks";
 import { Grid, Card, Container, CssBaseline, Grow } from "@mui/material";
 import OrderItem from "./OrderItem";
 import { IOrder } from "../../shared/interfaces/orderInterfaces";
@@ -9,16 +8,10 @@ interface IProps {
 }
 
 const OrdersList: FC<IProps> = ({ orders }) => {
-  const user = useAppSelector((state) => state.user.user);
-  const id = user !== null ? user.id : "";
-  const userIsSeller =
-    user !== null ? user.userType === "SELLER" && user.isVerified : false;
   const items = orders.map((order) => (
     <OrderItem
       key={order.id}
       item={order}
-      sellerId={id}
-      userIsSeller={userIsSeller}
     />
   ));
   return (
@@ -45,7 +38,7 @@ const OrdersList: FC<IProps> = ({ orders }) => {
             >
               <Grid
                 container
-                sx={{ display: "flex", flexDirection: "row", width: "1000" }}
+                sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "1000" }}
               >
                 {items}
               </Grid>

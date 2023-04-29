@@ -6,12 +6,14 @@ import { ICreateOrder, IOrder } from "../shared/interfaces/orderInterfaces";
 import {
   CreateOrder,
   GetDeliveredOrCanceledOrdersBySeller,
-  GetAllOrders
+  GetAllOrders,
+  GetDeliveredOrdersByBuyer
 } from "../services/OrdersService";
 
 export interface OrdersState {
   sellerDeliveredOrders: IOrder[];
   allOrders: IOrder[];
+  buyerDeliveredOrders: IOrder[];
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -20,6 +22,7 @@ export interface OrdersState {
 const initialState: OrdersState = {
   sellerDeliveredOrders: [],
   allOrders: [],
+  buyerDeliveredOrders: [],
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -75,6 +78,21 @@ export const getAllOrdersAction = createAsyncThunk(
   }
 );
 
+export const getDeliveredByBuyerAction = createAsyncThunk(
+  "orders/getDeliveredByBuyer",
+  async (data: IGetOrders, thunkApi) => {
+    try {
+      const response = await GetDeliveredOrdersByBuyer(
+        data.id,
+        data.query
+      );
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
@@ -90,6 +108,12 @@ const ordersSlice = createSlice({
     },
     clearAllOrders(state) {
       state.allOrders = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearBuyerDeliveredOrders(state) {
+      state.buyerDeliveredOrders = [];
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
@@ -186,8 +210,38 @@ const ordersSlice = createSlice({
         });
       }
     );
+
+    builder.addCase(getDeliveredByBuyerAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getDeliveredByBuyerAction.fulfilled,
+      (state, action: PayloadAction<IPagedOrders>) => {
+        state.apiState = "COMPLETED";
+        state.buyerDeliveredOrders = [...action.payload.items];
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
+      }
+    );
+    builder.addCase(
+      getDeliveredByBuyerAction.rejected,
+      (state, action) => {
+        state.apiState = "REJECTED";
+        let error: string = defaultErrorMessage;
+        if (typeof action.payload === "string") {
+          error = action.payload;
+        }
+
+        toast.error(error, {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
   },
 });
 
-export const { changePage, clearSellerDeliveredOrders, clearAllOrders } = ordersSlice.actions;
+export const { changePage, clearSellerDeliveredOrders, clearAllOrders, clearBuyerDeliveredOrders } = ordersSlice.actions;
 export default ordersSlice.reducer;

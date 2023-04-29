@@ -13,3 +13,7 @@ export const GetDeliveredOrCanceledOrdersBySeller = async (id:string, query: str
 export const GetAllOrders = async (query: string) => {
     return await axiosClient.get(`${API}/orders${query}`);
 }
+
+export const GetDeliveredOrdersByBuyer = async (id:string, query: string) => {
+    return await axiosClient.get(`${API}/orders/buyer/${id}/delivered${query}`);
+}
