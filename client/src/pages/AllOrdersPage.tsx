@@ -18,7 +18,7 @@ const AllOrdersPage: FC = () => {
   const page = useAppSelector((state) => state.orders.page);
   const totalPages = useAppSelector((state) => state.orders.totalPages);
   const pageSearch = new URLSearchParams(location.search).get("page");
-  const currentPage: number = pageSearch !== null ? parseInt(pageSearch) : 1;
+  const currentPage: number = pageSearch !== null ? isNaN(parseInt(pageSearch)) ? 1 : parseInt(pageSearch) : 1;
   const [isInitial, setIsInitial] = useState<boolean>(true);
 
   useEffect(() => {
