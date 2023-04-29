@@ -24,6 +24,7 @@ namespace Domain.AppSettings
         public int UsersPageSize { get; set; }
         public int ProductsPageSize { get; set; }
         public int OrdersPageSize { get; set; }
+        public int BuyerOrdersPageSize { get; set; }
         public string TokenIssuer { get; set; }
         public int TokenDuration { get; set; }
         public string SendgridApi { get; set; }
