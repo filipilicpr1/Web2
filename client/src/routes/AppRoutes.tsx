@@ -17,6 +17,7 @@ import MyOrdersPage from "../pages/MyOrdersPage";
 import AllOrdersPage from "../pages/AllOrdersPage";
 import HistoryPage from "../pages/HistoryPage";
 import ActiveOrdersPage from "../pages/ActiveOrdersPage";
+import NewOrdersPage from "../pages/NewOrdersPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -64,6 +65,9 @@ const AppRoutes: FC = () => {
             )}
             {isVerifiedSeller && (
               <Route path="/my-orders" element={<MyOrdersPage />} />
+            )}
+            {isVerifiedSeller && (
+              <Route path="/new-orders" element={<NewOrdersPage />} />
             )}
             {isAdmin && (
               <Route path="/all-orders" element={<AllOrdersPage />} />

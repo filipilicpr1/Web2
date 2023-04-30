@@ -9,6 +9,7 @@ import {
   GetAllOrders,
   GetDeliveredOrdersByBuyer,
   GetOngoingOrdersByBuyer,
+  GetOngoingOrdersBySeller
 } from "../services/OrdersService";
 
 export interface OrdersState {
@@ -16,6 +17,7 @@ export interface OrdersState {
   allOrders: IOrder[];
   buyerDeliveredOrders: IOrder[];
   buyerOngoingOrders: IOrder[];
+  sellerOngoingOrders: IOrder[];
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -26,6 +28,7 @@ const initialState: OrdersState = {
   allOrders: [],
   buyerDeliveredOrders: [],
   buyerOngoingOrders: [],
+  sellerOngoingOrders: [],
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -105,6 +108,18 @@ export const getOngoingByBuyerAction = createAsyncThunk(
   }
 );
 
+export const getOngoingBySellerAction = createAsyncThunk(
+  "orders/getOngoingBySeller",
+  async (data: IGetOrders, thunkApi) => {
+    try {
+      const response = await GetOngoingOrdersBySeller(data.id, data.query);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
@@ -132,6 +147,12 @@ const ordersSlice = createSlice({
     },
     clearBuyerOngoingOrders(state) {
       state.buyerOngoingOrders = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearSellerOngoingOrders(state) {
+      state.sellerOngoingOrders = [];
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
@@ -279,6 +300,33 @@ const ordersSlice = createSlice({
         pauseOnHover: false,
       });
     });
+
+    builder.addCase(getOngoingBySellerAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getOngoingBySellerAction.fulfilled,
+      (state, action: PayloadAction<IPagedOrders>) => {
+        state.apiState = "COMPLETED";
+        state.sellerOngoingOrders = [...action.payload.items];
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
+      }
+    );
+    builder.addCase(getOngoingBySellerAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
   },
 });
 
@@ -288,5 +336,6 @@ export const {
   clearAllOrders,
   clearBuyerDeliveredOrders,
   clearBuyerOngoingOrders,
+  clearSellerOngoingOrders,
 } = ordersSlice.actions;
 export default ordersSlice.reducer;
