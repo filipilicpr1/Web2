@@ -8,6 +8,7 @@ import {
   Box,
 } from "@mui/material";
 import { IProduct } from "../../shared/interfaces/productsInterfaces";
+import { defaultCurrency } from "../../constants/Constants";
 
 interface IProps {
   item: IProduct;
@@ -29,16 +30,25 @@ const ProductCardContent: FC<IProps> = (props) => {
           overflow: "hidden",
         }}
       >
-        <Box sx={{position: "relative", pb: "100%", overflow: "hidden", borderRadius: "25px"}}>
-
-        <CardMedia
-          component="img"
-          image={props.item.imageSource}
-          height="auto"
-          alt="pic"
-          sx={{ transition: "transform 0.35s ease-in-out", position: "absolute" }}
+        <Box
+          sx={{
+            position: "relative",
+            pb: "100%",
+            overflow: "hidden",
+            borderRadius: "25px",
+          }}
+        >
+          <CardMedia
+            component="img"
+            image={props.item.imageSource}
+            height="auto"
+            alt="pic"
+            sx={{
+              transition: "transform 0.35s ease-in-out",
+              position: "absolute",
+            }}
           />
-          </Box>
+        </Box>
       </Box>
       <CardContent>
         <Typography
@@ -67,9 +77,14 @@ const ProductCardContent: FC<IProps> = (props) => {
               justifyContent: "flex-end",
             }}
           >
-            <Typography variant="h6" color="text.primary">
-              {props.item.price + " RSD"}
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Typography variant="h6" color="text.primary">
+                {props.item.price}
+              </Typography>
+              <Typography variant="body2" mt={1} ml={0.5}>
+                {defaultCurrency}
+              </Typography>
+            </Box>
           </Grid>
         </Grid>
         {props.showSeller && (
