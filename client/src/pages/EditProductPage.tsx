@@ -11,6 +11,7 @@ const EditProductPage: FC = () => {
     const dispatch = useAppDispatch();
     const params = useParams();
     const id = params.productId || "";
+    const product = useAppSelector((state) => state.products.editProduct);
 
     const apiState = useAppSelector((state) => state.products.apiState);
 
@@ -22,7 +23,7 @@ const EditProductPage: FC = () => {
         <>
             <Container component="main">
                 <CssBaseline />
-                <PageTitle title="Edit Product" />
+                {product !== null && <PageTitle title="Edit Product" />}
                 <EditProductForm />
             </Container>
             <LoadingModal show={apiState === "PENDING"} />

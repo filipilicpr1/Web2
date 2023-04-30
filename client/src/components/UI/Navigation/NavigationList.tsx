@@ -93,7 +93,7 @@ const NavigationList: FC = () => {
     return (
       <ListItemButton key={item.index} {...buttonProps(item.index)}>
         <ListItemIcon>{icons.get(item.name)}</ListItemIcon>
-        <ListItemText primary={item.name} />
+        <ListItemText primary={item.name === "" ? "Products" : item.name} />
       </ListItemButton>
     );
   });
