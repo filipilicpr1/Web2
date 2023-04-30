@@ -9,7 +9,8 @@ import {
   GetAllOrders,
   GetDeliveredOrdersByBuyer,
   GetOngoingOrdersByBuyer,
-  GetOngoingOrdersBySeller
+  GetOngoingOrdersBySeller,
+  GetOrderById
 } from "../services/OrdersService";
 
 export interface OrdersState {
@@ -18,6 +19,7 @@ export interface OrdersState {
   buyerDeliveredOrders: IOrder[];
   buyerOngoingOrders: IOrder[];
   sellerOngoingOrders: IOrder[];
+  detailedOrder: IOrder | null;
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -29,6 +31,7 @@ const initialState: OrdersState = {
   buyerDeliveredOrders: [],
   buyerOngoingOrders: [],
   sellerOngoingOrders: [],
+  detailedOrder: null,
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -120,6 +123,18 @@ export const getOngoingBySellerAction = createAsyncThunk(
   }
 );
 
+export const getByIdAction = createAsyncThunk(
+  "orders/getById",
+  async (id: string, thunkApi) => {
+    try {
+      const response = await GetOrderById(id);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
@@ -155,6 +170,10 @@ const ordersSlice = createSlice({
       state.sellerOngoingOrders = [];
       state.page = 1;
       state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearDetailedOrder(state) {
+      state.detailedOrder = null;
       state.apiState = "COMPLETED";
     },
   },
@@ -327,6 +346,31 @@ const ordersSlice = createSlice({
         pauseOnHover: false,
       });
     });
+
+    builder.addCase(getByIdAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getByIdAction.fulfilled,
+      (state, action: PayloadAction<IOrder>) => {
+        state.apiState = "COMPLETED";
+        state.detailedOrder = {...action.payload};
+      }
+    );
+    builder.addCase(getByIdAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
   },
 });
 
@@ -337,5 +381,6 @@ export const {
   clearBuyerDeliveredOrders,
   clearBuyerOngoingOrders,
   clearSellerOngoingOrders,
+  clearDetailedOrder
 } = ordersSlice.actions;
 export default ordersSlice.reducer;

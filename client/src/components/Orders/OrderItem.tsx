@@ -15,12 +15,14 @@ import { useAppSelector } from "../../store/hooks";
 import OrderBottomInfo from "./OrderBottomInfo";
 import ActiveOrderBottomInfo from "./ActiveOrderBottomInfo";
 import { defaultCurrency } from "../../constants/Constants";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
   item: IOrder;
 }
 
 const OrderItem: FC<IProps> = (props) => {
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.user.user);
   const userIsSeller = user?.userType === "SELLER";
   const id = user !== null ? user.id : "";
@@ -31,10 +33,15 @@ const OrderItem: FC<IProps> = (props) => {
     .toLocaleString("en-GB")
     .split(",")[0];
 
+  const clickHandler = () => {
+    navigate("/orders/" + props.item.id);
+  };
+
   return (
     <Grow in={true}>
       <Grid item xs={3}>
         <StyledCard
+          onClick={clickHandler}
           sx={{
             m: 2,
             borderRadius: "25px",

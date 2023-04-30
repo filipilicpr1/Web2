@@ -11,11 +11,12 @@ const MyStyledCard = styled(Card)(({ theme }) => ({
 interface IProps {
     children: React.ReactNode,
     sx: SxProps<Theme> | undefined
+    onClick: () => void
 }
 
 const StyledCard : FC<IProps> = (props) => {
     return(
-        <MyStyledCard sx={props.sx}>
+        <MyStyledCard onClick={props.onClick} sx={props.sx}>
             {props.children}
         </MyStyledCard>
     );

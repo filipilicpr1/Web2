@@ -25,3 +25,7 @@ export const GetOngoingOrdersByBuyer = async (id:string, query: string) => {
 export const GetOngoingOrdersBySeller = async (id:string, query: string) => {
     return await axiosClient.get(`${API}/orders/seller/${id}/in-progress${query}`);
 }
+
+export const GetOrderById = async (id:string) => {
+    return await axiosClient.get(`${API}/orders/${id}`);
+}

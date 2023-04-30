@@ -37,7 +37,7 @@ const CheckoutItemContent: FC<IProps> = (props) => {
             sx={{ borderRadius: "50px", p: 3, height: "200px" }}
           />
         </Box>
-        <CardContent sx={{mt: 0.5}}>
+        <CardContent sx={{ mt: 0.5 }}>
           <Typography
             gutterBottom
             variant="h5"
@@ -46,7 +46,7 @@ const CheckoutItemContent: FC<IProps> = (props) => {
           >
             {props.item.name}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" mt={-1} mb={1}>
             {props.item.description}
           </Typography>
           <Grid container sx={{ display: "flex", flexDirection: "row" }}>
@@ -59,9 +59,14 @@ const CheckoutItemContent: FC<IProps> = (props) => {
                 justifyContent: "flex-start",
               }}
             >
-              <Typography variant="h6" color="text.primary">
-                {props.item.price + defaultCurrency}
-              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <Typography variant="h6" color="text.primary">
+                  {props.item.price}
+                </Typography>
+                <Typography variant="body2" mt={1} ml={0.5}>
+                  {defaultCurrency}
+                </Typography>
+              </Box>
             </Grid>
           </Grid>
           <Grid
@@ -86,13 +91,13 @@ const CheckoutItemContent: FC<IProps> = (props) => {
               sx={{
                 display: "flex",
                 flexDirection: "row",
-                justifyContent: "flex-end",
+                justifyContent: "flex-start",
               }}
             >
               <Typography
                 variant="h6"
                 color="text.primary"
-                sx={{ mt: 2, mr: 1 }}
+                sx={{ mt: 2.5, mr: 1 }}
               >
                 {props.item.seller.username}
               </Typography>
