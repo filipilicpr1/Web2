@@ -60,7 +60,7 @@ const CheckoutList: FC = () => {
       return;
     }
     dispatch(clearCart());
-    navigate("/active-orders"); // navigate to order page
+    navigate("/active-orders");
   }, [apiState, navigate, requestSent, dispatch]);
 
   return (

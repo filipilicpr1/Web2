@@ -7,13 +7,15 @@ import {
   CreateOrder,
   GetDeliveredOrCanceledOrdersBySeller,
   GetAllOrders,
-  GetDeliveredOrdersByBuyer
+  GetDeliveredOrdersByBuyer,
+  GetOngoingOrdersByBuyer,
 } from "../services/OrdersService";
 
 export interface OrdersState {
   sellerDeliveredOrders: IOrder[];
   allOrders: IOrder[];
   buyerDeliveredOrders: IOrder[];
+  buyerOngoingOrders: IOrder[];
   page: number;
   totalPages: number;
   apiState: ApiCallState;
@@ -23,6 +25,7 @@ const initialState: OrdersState = {
   sellerDeliveredOrders: [],
   allOrders: [],
   buyerDeliveredOrders: [],
+  buyerOngoingOrders: [],
   page: 1,
   totalPages: 0,
   apiState: "COMPLETED",
@@ -82,10 +85,19 @@ export const getDeliveredByBuyerAction = createAsyncThunk(
   "orders/getDeliveredByBuyer",
   async (data: IGetOrders, thunkApi) => {
     try {
-      const response = await GetDeliveredOrdersByBuyer(
-        data.id,
-        data.query
-      );
+      const response = await GetDeliveredOrdersByBuyer(data.id, data.query);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+export const getOngoingByBuyerAction = createAsyncThunk(
+  "orders/getOngoingByBuyer",
+  async (data: IGetOrders, thunkApi) => {
+    try {
+      const response = await GetOngoingOrdersByBuyer(data.id, data.query);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -114,6 +126,12 @@ const ordersSlice = createSlice({
     },
     clearBuyerDeliveredOrders(state) {
       state.buyerDeliveredOrders = [];
+      state.page = 1;
+      state.totalPages = 0;
+      state.apiState = "COMPLETED";
+    },
+    clearBuyerOngoingOrders(state) {
+      state.buyerOngoingOrders = [];
       state.page = 1;
       state.totalPages = 0;
       state.apiState = "COMPLETED";
@@ -193,23 +211,20 @@ const ordersSlice = createSlice({
         state.totalPages = action.payload.totalPages;
       }
     );
-    builder.addCase(
-      getAllOrdersAction.rejected,
-      (state, action) => {
-        state.apiState = "REJECTED";
-        let error: string = defaultErrorMessage;
-        if (typeof action.payload === "string") {
-          error = action.payload;
-        }
-
-        toast.error(error, {
-          position: "top-center",
-          autoClose: 2500,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
+    builder.addCase(getAllOrdersAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
       }
-    );
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
 
     builder.addCase(getDeliveredByBuyerAction.pending, (state) => {
       state.apiState = "PENDING";
@@ -223,25 +238,55 @@ const ordersSlice = createSlice({
         state.totalPages = action.payload.totalPages;
       }
     );
-    builder.addCase(
-      getDeliveredByBuyerAction.rejected,
-      (state, action) => {
-        state.apiState = "REJECTED";
-        let error: string = defaultErrorMessage;
-        if (typeof action.payload === "string") {
-          error = action.payload;
-        }
+    builder.addCase(getDeliveredByBuyerAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
 
-        toast.error(error, {
-          position: "top-center",
-          autoClose: 2500,
-          closeOnClick: true,
-          pauseOnHover: false,
-        });
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(getOngoingByBuyerAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      getOngoingByBuyerAction.fulfilled,
+      (state, action: PayloadAction<IPagedOrders>) => {
+        state.apiState = "COMPLETED";
+        state.buyerOngoingOrders = [...action.payload.items];
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
       }
     );
+    builder.addCase(getOngoingByBuyerAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
   },
 });
 
-export const { changePage, clearSellerDeliveredOrders, clearAllOrders, clearBuyerDeliveredOrders } = ordersSlice.actions;
+export const {
+  changePage,
+  clearSellerDeliveredOrders,
+  clearAllOrders,
+  clearBuyerDeliveredOrders,
+  clearBuyerOngoingOrders,
+} = ordersSlice.actions;
 export default ordersSlice.reducer;

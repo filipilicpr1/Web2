@@ -16,6 +16,7 @@ import EditProductPage from "../pages/EditProductPage";
 import MyOrdersPage from "../pages/MyOrdersPage";
 import AllOrdersPage from "../pages/AllOrdersPage";
 import HistoryPage from "../pages/HistoryPage";
+import ActiveOrdersPage from "../pages/ActiveOrdersPage";
 
 const AppRoutes: FC = () => {
   const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
@@ -48,6 +49,7 @@ const AppRoutes: FC = () => {
             <Route path="/change-password" element={<ChangePasswordPage />} />
             {isBuyer && <Route path="/checkout" element={<CheckoutPage />} />}
             {isBuyer && <Route path="/history" element={<HistoryPage />} />}
+            {isBuyer && <Route path="/active-orders" element={<ActiveOrdersPage />} />}
             {isVerifiedSeller && (
               <Route path="/new-product" element={<NewProductPage />} />
             )}
