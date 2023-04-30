@@ -2,8 +2,10 @@ import React, { FC } from "react";
 import { useAppSelector } from "../../store/hooks";
 import SellerProductItem from "./SellerProductItem";
 import { Grid, Card, Container, CssBaseline } from "@mui/material";
+import PageTitle from "../UI/Title/PageTitle";
 
 const SellerProductsList: FC = () => {
+  const apiState = useAppSelector((state) => state.products.apiState);
   const sellerProducts = useAppSelector(
     (state) => state.products.sellerProducts
   );
@@ -40,6 +42,7 @@ const SellerProductsList: FC = () => {
           </Card>
         </Container>
       )}
+      {(sellerProducts.length <= 0 && apiState === "COMPLETED") && <PageTitle title="WOW SUCH EMPTY" />}
     </>
   );
 };

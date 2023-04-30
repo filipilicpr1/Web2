@@ -2,8 +2,10 @@ import React, { FC } from "react";
 import { useAppSelector } from "../../store/hooks";
 import ProductItem from "./ProductItem";
 import { Grid, Card, Container, CssBaseline, Grow } from "@mui/material";
+import PageTitle from "../UI/Title/PageTitle";
 
 const ProductsList: FC = () => {
+  const apiState = useAppSelector((state) => state.products.apiState);
   const products = useAppSelector((state) => state.products.products);
   const items = products.map((product) => (
     <ProductItem key={product.id} item={product} />
@@ -40,6 +42,7 @@ const ProductsList: FC = () => {
           </Container>
         </Grow>
       )}
+      {(products.length <= 0 && apiState === "COMPLETED") && <PageTitle title="WOW SUCH EMPTY" />}
     </>
   );
 };

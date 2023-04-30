@@ -2,12 +2,15 @@ import React, { FC } from "react";
 import { Grid, Card, Container, CssBaseline, Grow } from "@mui/material";
 import OrderItem from "./OrderItem";
 import { IOrder } from "../../shared/interfaces/orderInterfaces";
+import PageTitle from "../UI/Title/PageTitle";
+import { useAppSelector } from "../../store/hooks";
 
 interface IProps {
   orders: IOrder[];
 }
 
 const OrdersList: FC<IProps> = ({ orders }) => {
+  const apiState = useAppSelector((state) => state.orders.apiState);
   const items = orders.map((order) => (
     <OrderItem
       key={order.id}
@@ -46,6 +49,7 @@ const OrdersList: FC<IProps> = ({ orders }) => {
           </Container>
         </Grow>
       )}
+      {(orders.length <= 0 && apiState === "COMPLETED") && <PageTitle title="WOW SUCH EMPTY" />}
     </>
   );
 };

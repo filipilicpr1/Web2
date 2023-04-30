@@ -7,11 +7,13 @@ import LoadingModal from "../components/UI/Modal/LoadingModal";
 
 const CheckoutPage: FC = () => {
   const apiState = useAppSelector((state) => state.orders.apiState);
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const pageTitle = cartItems.length > 0 ? "Checkout" : "YOUR CART IS EMPTY";
   return (
     <>
       <Container component="main">
         <CssBaseline />
-        <PageTitle title="Checkout" />
+        <PageTitle title={pageTitle} />
         <CheckoutList />
       </Container>
       <LoadingModal show={apiState === "PENDING"} />
