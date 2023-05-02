@@ -11,8 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SendGrid.Helpers.Mail;
-using SendGrid;
 using Services.Abstractions;
 using Services.Helpers;
 using System;

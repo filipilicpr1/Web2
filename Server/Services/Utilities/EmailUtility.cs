@@ -4,8 +4,10 @@ using Domain.Models;
 using Domain.Repositories;
 using Domain.Utilities;
 using Microsoft.Extensions.Options;
-using SendGrid.Helpers.Mail;
-using SendGrid;
+using AutoMapper.Internal;
+using MailKit.Security;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace Services.Utilities
 {
@@ -18,15 +20,23 @@ namespace Services.Utilities
         }
         public async Task SendEmail(string email, string name, bool isAccepted)
         {
-            var client = new SendGridClient(_settings.Value.SendgridApi);
-            var senderEmail = new EmailAddress(_settings.Value.SendgridEmail, _settings.Value.SendgridName);
-            var receiverEmail = new EmailAddress(email, name);
 
-            string emailSubject = "Verification result";
-            string htmlContent = "<p>" + "Your request has been " + (isAccepted ? "accepted." : "denied.") + "</p>";
+            string htmlContent = "<p>" + "Your request has been " + (isAccepted ? "accepted." : "rejected.") + "</p>";
+            var mail = new MimeMessage();
+            mail.Sender = MailboxAddress.Parse(_settings.Value.Email);
+            mail.To.Add(MailboxAddress.Parse(email));
 
-            var msg = MailHelper.CreateSingleEmail(senderEmail, receiverEmail, emailSubject, "", htmlContent);
-            await client.SendEmailAsync(msg).ConfigureAwait(false);
+            mail.Subject = "Verification result";
+
+            var builder = new BodyBuilder();
+            builder.HtmlBody = htmlContent;
+            mail.Body = builder.ToMessageBody();
+            
+            var smtp = new SmtpClient();
+            smtp.Connect(_settings.Value.Host, _settings.Value.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_settings.Value.Email, _settings.Value.Password);
+            await smtp.SendAsync(mail);
+            smtp.Disconnect(true);
         }
     }
 }

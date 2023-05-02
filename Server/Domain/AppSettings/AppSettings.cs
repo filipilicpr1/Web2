@@ -27,9 +27,10 @@ namespace Domain.AppSettings
         public int BuyerOrdersPageSize { get; set; }
         public string TokenIssuer { get; set; }
         public int TokenDuration { get; set; }
-        public string SendgridApi { get; set; }
-        public string SendgridEmail { get; set; }
-        public string SendgridName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
         public string GoogleClientId { get; set; }
         public string GoogleClientSecret { get; set; }
     }
