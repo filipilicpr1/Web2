@@ -24,5 +24,6 @@ export interface IOrder {
     deliveryTime: string,
     isCanceled: boolean,
     status: OrderStatuses,
+    canCancel: boolean,
     orderProducts: IProduct[]
 }

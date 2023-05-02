@@ -7,8 +7,10 @@ interface IProps {
 }
 
 const ActiveOrderBottomInfo: FC<IProps> = (props) => {
-  const mins = props.deliveryTime.getMinutes() - new Date().getMinutes();
-  const adjustedMins = mins < 0 ? mins + 60 : mins;
+  const today = new Date();
+  const hours = props.deliveryTime.getHours() - today.getHours();
+  const mins = props.deliveryTime.getMinutes() - today.getMinutes();
+  const adjustedMins = hours * 60 + mins;
   const orderDate = new Date(props.orderTime).toLocaleString("en-GB");
 
   return (

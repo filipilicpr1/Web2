@@ -1,21 +1,16 @@
 import React, { FC } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppSelector } from "../../store/hooks";
 import {
-  Button,
-  Grid,
   Card,
   Grow,
-  Zoom,
   Box,
-  Avatar,
-  TextField,
   Typography,
 } from "@mui/material";
 import DetailedOrderItem from "./DetailedOrderItem";
 import DetailedOrderBuyerImage from "./DetailedOrderBuyerImage";
-import DetailedOrderProduct from "./DetailedOrderProduct";
 import DetailedOrderProductsList from "./DetailedOrderProductsList";
 import { defaultCurrency } from "../../constants/Constants";
+import DetailedOrderActions from "./DetailedOrderActions";
 
 const DetailedOrder: FC = () => {
   const order = useAppSelector((state) => state.orders.detailedOrder);
@@ -24,14 +19,13 @@ const DetailedOrder: FC = () => {
     <>
       {order !== null && (
         <Grow in={true}>
-          <Box>
+          <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <Card
               sx={{
                 margin: "1rem",
                 mt: 6,
                 pb: 2,
                 pl: 3,
-                ml: 13,
                 pt: 2,
                 width: "80%",
                 borderRadius: "20px",
@@ -85,7 +79,6 @@ const DetailedOrder: FC = () => {
                 mt: 6,
                 pb: 2,
                 pl: 3,
-                ml: 13,
                 pt: 2,
                 width: "80%",
                 borderRadius: "20px",
@@ -131,6 +124,7 @@ const DetailedOrder: FC = () => {
                 </Box>
               </Box>
             </Card>
+            <DetailedOrderActions order={order} />
           </Box>
         </Grow>
       )}

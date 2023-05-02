@@ -46,7 +46,7 @@ const CheckoutList: FC = () => {
         return { productId: item.item.id, amount: item.amount };
       }),
     };
-    
+
     dispatch(createOrderAction(data));
     setRequestSent(true);
   };
@@ -59,7 +59,9 @@ const CheckoutList: FC = () => {
     if (!(apiState === "COMPLETED")) {
       return;
     }
-    dispatch(clearCart());
+    setTimeout(() => {
+      dispatch(clearCart());
+    }, 500);
     navigate("/active-orders");
   }, [apiState, navigate, requestSent, dispatch]);
 

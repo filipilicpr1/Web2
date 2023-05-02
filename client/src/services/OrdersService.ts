@@ -29,3 +29,7 @@ export const GetOngoingOrdersBySeller = async (id:string, query: string) => {
 export const GetOrderById = async (id:string) => {
     return await axiosClient.get(`${API}/orders/${id}`);
 }
+
+export const CancelOrder = async (id:string) => {
+    return await axiosClient.put(`${API}/orders/${id}/cancel`);
+}

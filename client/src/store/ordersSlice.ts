@@ -10,7 +10,8 @@ import {
   GetDeliveredOrdersByBuyer,
   GetOngoingOrdersByBuyer,
   GetOngoingOrdersBySeller,
-  GetOrderById
+  GetOrderById,
+  CancelOrder
 } from "../services/OrdersService";
 
 export interface OrdersState {
@@ -128,6 +129,18 @@ export const getByIdAction = createAsyncThunk(
   async (id: string, thunkApi) => {
     try {
       const response = await GetOrderById(id);
+      return thunkApi.fulfillWithValue(response.data);
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data.error);
+    }
+  }
+);
+
+export const cancelOrderAction = createAsyncThunk(
+  "orders/cancel",
+  async (id: string, thunkApi) => {
+    try {
+      const response = await CancelOrder(id);
       return thunkApi.fulfillWithValue(response.data);
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data.error);
@@ -358,6 +371,37 @@ const ordersSlice = createSlice({
       }
     );
     builder.addCase(getByIdAction.rejected, (state, action) => {
+      state.apiState = "REJECTED";
+      let error: string = defaultErrorMessage;
+      if (typeof action.payload === "string") {
+        error = action.payload;
+      }
+
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2500,
+        closeOnClick: true,
+        pauseOnHover: false,
+      });
+    });
+
+    builder.addCase(cancelOrderAction.pending, (state) => {
+      state.apiState = "PENDING";
+    });
+    builder.addCase(
+      cancelOrderAction.fulfilled,
+      (state) => {
+        state.apiState = "COMPLETED";
+
+        toast.success("Your order has been canceled", {
+          position: "top-center",
+          autoClose: 2500,
+          closeOnClick: true,
+          pauseOnHover: false,
+        });
+      }
+    );
+    builder.addCase(cancelOrderAction.rejected, (state, action) => {
       state.apiState = "REJECTED";
       let error: string = defaultErrorMessage;
       if (typeof action.payload === "string") {
