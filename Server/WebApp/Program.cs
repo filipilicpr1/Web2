@@ -106,7 +106,7 @@ builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
     cfg.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-    cfg.AddProfile(new OrderMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
+    cfg.AddProfile(new OrderMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"],  int.Parse(builder.Configuration.GetSection("AppSettings")["CancelTime"])));
 }).CreateMapper());
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();

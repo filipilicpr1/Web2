@@ -14,10 +14,12 @@ namespace Services.Mapping
 {
     public class OrderMappingProfile : Profile
     {
-        public OrderMappingProfile(string defaultImagePath)
+        public OrderMappingProfile(string defaultImagePath, int cancelTime)
         {
             CreateMap<Order, CreateOrderDTO>().ReverseMap();
-            CreateMap<Order, DisplayOrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetOrderStatus(src))).ReverseMap();
+            CreateMap<Order, DisplayOrderDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetOrderStatus(src)))
+                                               .ForMember(dest => dest.CanCancel, opt => opt.MapFrom(src => src.OrderTime.AddMinutes(cancelTime) > DateTime.Now))
+                                               .ReverseMap();
             CreateMap<CreateOrderDTO, Order>().ForMember(dest => dest.OrderProducts, opt => opt.Ignore());
             CreateMap<OrderProduct, DisplayProductDTO>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Product.Id))
                                                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Product.Name))

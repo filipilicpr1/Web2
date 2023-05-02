@@ -18,6 +18,7 @@ namespace Contracts.OrderDTOs
         public DateTime OrderTime { get; set; }
         public DateTime DeliveryTime { get; set; }
         public bool IsCanceled { get; set; }
+        public bool CanCancel { get; set; }
         public string Status { get; set; }
         public IReadOnlyList<DisplayProductDTO> OrderProducts { get; set; }
     }

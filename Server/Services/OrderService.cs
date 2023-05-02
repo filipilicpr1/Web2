@@ -77,6 +77,7 @@ namespace Services
             await _unitOfWork.Orders.Add(order);
 
             double price = 0;
+            List<Guid> sellerIds = new List<Guid>();
             foreach (CreateOrderProductDTO createOrderProductDTO in createOrderDTO.OrderProducts)
             {
                 Product product = await _unitOfWork.Products.Find(createOrderProductDTO.ProductId);
@@ -101,11 +102,16 @@ namespace Services
                 await _unitOfWork.OrderProducts.Add(orderProduct);
                 product.Amount -= createOrderProductDTO.Amount;
                 price += product.Price * orderProduct.Amount;
+                if(sellerIds.Contains(product.SellerId))
+                {
+                    continue;
+                }
+                sellerIds.Add(product.SellerId);
             }
 
             order.OrderTime = DateTime.Now;
             order.DeliveryTime = order.OrderTime.AddMinutes(_randomUtility.GetRandomNumberInRange(_settings.Value.MinDeliveryTime, _settings.Value.MaxDeliveryTime));
-            order.Price = price + _settings.Value.DeliveryFee;
+            order.Price = price + _settings.Value.DeliveryFee * sellerIds.Count;
 
             await _unitOfWork.Save();
             return _mapper.Map<DisplayOrderDTO>(await _unitOfWork.Orders.GetDetailed(order.Id));
