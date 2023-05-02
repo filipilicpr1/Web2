@@ -214,7 +214,7 @@ namespace Services
             return _mapper.Map<DisplayUserDTO>(user);
         }
 
-        public async Task VerifyUser(Guid id, bool isAccepted)
+        public async Task<DisplayUserDTO> VerifyUser(Guid id, bool isAccepted)
         {
             User user = await _unitOfWork.Users.Find(id);
             if (user == null)
@@ -231,6 +231,7 @@ namespace Services
             user.VerificationStatus = isAccepted ? VerificationStatuses.ACCEPTED : VerificationStatuses.REJECTED;
             await _unitOfWork.Save();
             await _emailUtility.SendEmail(user.Email, user.Name, user.IsVerified);
+            return _mapper.Map<DisplayUserDTO>(user);
         }
         public async Task<AuthDTO> GoogleLogin(GoogleLoginDTO googleLoginDTO)
         {

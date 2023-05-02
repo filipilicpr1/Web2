@@ -67,8 +67,8 @@ namespace Presentation.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> VerifyUser(Guid id, [FromBody]  VerifyUserDTO verifyUserDTO)
         {
-            await _userService.VerifyUser(id, verifyUserDTO.IsAccepted);
-            return Ok();
+            DisplayUserDTO displayUserDTO = await _userService.VerifyUser(id, verifyUserDTO.IsAccepted);
+            return Ok(displayUserDTO);
         }
 
         [HttpGet("sellers")]

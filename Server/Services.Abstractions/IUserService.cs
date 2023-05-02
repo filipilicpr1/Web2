@@ -16,7 +16,7 @@ namespace Services.Abstractions
         Task<AuthDTO> Login(LoginDTO loginDTO);
         Task<DisplayUserDTO> UpdateUser(Guid id, string username, UpdateUserDTO updateUserDTO);
         Task<DisplayUserDTO> ChangePassword(Guid id, string username, ChangePasswordDTO changePasswordDTO);
-        Task VerifyUser(Guid id, bool isAccepted);
+        Task<DisplayUserDTO> VerifyUser(Guid id, bool isAccepted);
         Task<PagedListDTO<DisplayUserDTO>> GetAllSellers(int page);
         Task<PagedListDTO<DisplayUserDTO>> GetVerifiedSellers(int page);
         Task<AuthDTO> GoogleLogin(GoogleLoginDTO googleLoginDTO);
