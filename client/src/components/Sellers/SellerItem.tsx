@@ -3,6 +3,7 @@ import { IUser } from "../../shared/interfaces/userInterfaces";
 import { Grow, Grid, CardContent, Typography, Box } from "@mui/material";
 import StyledCard from "../UI/Styled/StyledCard";
 import SellerPhoto from "./SellerPhoto";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
   seller: IUser;
@@ -10,6 +11,7 @@ interface IProps {
 }
 
 const SellerItem: FC<IProps> = (props) => {
+    const navigate = useNavigate();
   const statusColor =
     props.seller.verificationStatus === "PENDING"
       ? "orange"
@@ -20,11 +22,15 @@ const SellerItem: FC<IProps> = (props) => {
     .toLocaleString("en-GB")
     .split(",")[0];
 
+    const clickHandler = () => {
+        navigate(`/sellers/${props.seller.id}`);
+    }
+
   return (
     <Grow in={true}>
       <Grid item xs={3}>
         <StyledCard
-          onClick={() => {}}
+          onClick={clickHandler}
           sx={{
             m: 2,
             borderRadius: "25px",

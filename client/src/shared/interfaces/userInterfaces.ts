@@ -66,3 +66,7 @@ export interface IFinishRegistration {
     address: string,
     birthDate: Date
 }
+
+export interface IVerifySeller {
+    isAccepted: boolean
+}

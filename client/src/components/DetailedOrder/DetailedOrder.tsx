@@ -6,8 +6,8 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import DetailedOrderItem from "./DetailedOrderItem";
-import DetailedOrderBuyerImage from "./DetailedOrderBuyerImage";
+import DetailedPageItem from "../UI/DetailedPage/DetailedPageItem";
+import DetailedPageImage from "../UI/DetailedPage/DetailedPageImage";
 import DetailedOrderProductsList from "./DetailedOrderProductsList";
 import { defaultCurrency } from "../../constants/Constants";
 import DetailedOrderActions from "./DetailedOrderActions";
@@ -36,38 +36,38 @@ const DetailedOrder: FC = () => {
                   "rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px",
               }}
             >
-              <DetailedOrderItem
+              <DetailedPageImage image={order.buyer.imageSource} />
+              <DetailedPageItem
                 id="name"
                 label="Buyer Name"
                 value={order.buyer.name + " " + order.buyer.lastName}
               />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="username"
                 label="Buyer Username"
                 value={order.buyer.username}
               />
-              <DetailedOrderBuyerImage image={order.buyer.imageSource} />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="orderTime"
                 label="Order Time"
                 value={new Date(order.orderTime).toLocaleString("en-GB")}
               />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="deliveryTime"
                 label="Delivery Time"
                 value={new Date(order.deliveryTime).toLocaleString("en-GB")}
               />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="address"
                 label="Delivery Address"
                 value={order.deliveryAddress}
               />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="comment"
                 label="Comment"
                 value={order.comment}
               />
-              <DetailedOrderItem
+              <DetailedPageItem
                 id="status"
                 label="Order Status"
                 value={order.status}

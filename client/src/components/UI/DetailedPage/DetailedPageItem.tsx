@@ -7,7 +7,7 @@ interface IProps {
   value: string;
 }
 
-const DetailedOrderItem: FC<IProps> = (props) => {
+const DetailedPageItem: FC<IProps> = (props) => {
   return (
     <Box
       sx={{
@@ -49,4 +49,4 @@ const DetailedOrderItem: FC<IProps> = (props) => {
   );
 };
 
-export default DetailedOrderItem;
+export default DetailedPageItem;
