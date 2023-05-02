@@ -12,6 +12,7 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PeopleIcon from '@mui/icons-material/People';
 import List from "@mui/material/List";
 import { useAppSelector } from "../../../store/hooks";
 import { IUser } from "../../../shared/interfaces/userInterfaces";
@@ -46,7 +47,8 @@ function generateItemsForUser(user: IUser): IItem[] | null {
   }
 
   if (user.userType === "ADMIN") {
-    items.push({ name: "Verification", index: index++ });
+    items.push({ name: "All sellers", index: index++ });
+    items.push({ name: "Verified sellers", index: index++ });
     items.push({ name: "All orders", index: index++ });
     return items;
   }
@@ -63,7 +65,8 @@ icons.set("New product", <QueueIcon />);
 icons.set("My products", <LibraryBooksIcon />);
 icons.set("New orders", <LocalMallIcon />);
 icons.set("My orders", <InventoryIcon />);
-icons.set("Verification", <VerifiedIcon />);
+icons.set("All sellers", <PeopleIcon />);
+icons.set("Verified sellers", <VerifiedIcon />);
 icons.set("All orders", <ViewListIcon />);
 
 const NavigationList: FC = () => {

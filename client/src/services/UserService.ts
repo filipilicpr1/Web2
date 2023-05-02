@@ -29,3 +29,11 @@ export const LoginGoogle = async (data: IAuth) => {
 export const FinishRegistration = async (id: string, data: IFinishRegistration) => {
     return await axiosClient.put(`${API}/users/${id}/finish-registration`, data);
 }
+
+export const GetAllSellers = async (query: string) => {
+    return await axiosClient.get(`${API}/users/sellers${query}`);
+}
+
+export const GetVerifiedSellers = async (query: string) => {
+    return await axiosClient.get(`${API}/users/sellers/verified${query}`);
+}
