@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(opt => {
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "http://localhost:7126",
+        ValidIssuer = "http://localhost:7127",
         IssuerSigningKey = key
     };
 });
@@ -87,10 +87,6 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 builder.Services.AddOptions();
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-builder.Services.AddSingleton<IRandomUtility, RandomUtility>();
 builder.Services.AddScoped<IEmailUtility, EmailUtility>();
 builder.Services.AddScoped<ITokenUtility, TokenUtility>();
 
@@ -105,8 +101,6 @@ builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(
 builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-    cfg.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
-    cfg.AddProfile(new OrderMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"],  int.Parse(builder.Configuration.GetSection("AppSettings")["CancelTime"])));
 }).CreateMapper());
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();

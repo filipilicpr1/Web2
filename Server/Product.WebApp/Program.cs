@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(opt => {
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "http://localhost:7126",
+        ValidIssuer = "http://localhost:7127",
         IssuerSigningKey = key
     };
 });
@@ -86,13 +86,10 @@ builder.Services.AddCors(options =>
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddOptions();
 
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddSingleton<IRandomUtility, RandomUtility>();
-builder.Services.AddScoped<IEmailUtility, EmailUtility>();
-builder.Services.AddScoped<ITokenUtility, TokenUtility>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
