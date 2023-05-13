@@ -22,10 +22,10 @@ namespace Persistence.Configurations
 
             builder.Property(x => x.RowVersion).IsRowVersion();
 
-            builder.HasOne(x => x.Buyer)
+            /*builder.HasOne(x => x.Buyer)
                .WithMany(x => x.Orders)
                .HasForeignKey(x => x.BuyerId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Cascade);*/
         }
     }
 }

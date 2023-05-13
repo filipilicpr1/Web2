@@ -8,7 +8,6 @@ namespace Domain.Repositories
 {
     public interface IUnitOfWork
     {
-        public IUserRepository Users { get; }
         public IProductRepository Products { get; }
         public IOrderRepository Orders { get; }
         public IOrderProductRepository OrderProducts { get; }

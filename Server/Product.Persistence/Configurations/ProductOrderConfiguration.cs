@@ -15,6 +15,8 @@ namespace Persistence.Configurations
         {
             builder.HasKey(x => new {x.OrderId, x.ProductId});
 
+            builder.Property(x => x.Price).HasPrecision(4, 2);
+
             builder.Property(x => x.RowVersion).IsRowVersion();
 
             builder.HasOne(x => x.Order)

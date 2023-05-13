@@ -12,7 +12,7 @@ namespace Persistence.Repositories
 {
     public class UserRepository : GenericRepository<User>, IUserRepository
     {
-        public UserRepository(ProjectDbContext dbContext) : base(dbContext)
+        public UserRepository(UserApiDbContext dbContext) : base(dbContext)
         {
 
         }

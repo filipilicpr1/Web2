@@ -17,7 +17,6 @@ namespace Domain.Models
         public DateTime DeliveryTime { get; set; }
         public bool IsCanceled { get; set; }
         public Guid BuyerId { get; set; }
-        public User Buyer { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
         public byte[] RowVersion { get; set; }
     }

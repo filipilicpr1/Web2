@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
+builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly).AddDapr();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -91,17 +91,15 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddSingleton<IRandomUtility, RandomUtility>();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProjectDatabase"), b => b.MigrationsAssembly("WebApp")));
+builder.Services.AddDbContext<ProductApiDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProductApiDatabase"), b => b.MigrationsAssembly("Product.WebApp")));
 
 builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
-    cfg.AddProfile(new UserMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
     cfg.AddProfile(new ProductMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"]));
     cfg.AddProfile(new OrderMappingProfile(builder.Configuration.GetSection("AppSettings")["DefaultImagePath"],  int.Parse(builder.Configuration.GetSection("AppSettings")["CancelTime"])));
 }).CreateMapper());
@@ -113,7 +111,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     // apply new migrations on startup
-    var context = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<ProductApiDbContext>();
     context.Database.EnsureCreated();
 }
 
@@ -124,7 +122,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseStaticFiles(new StaticFileOptions
 {

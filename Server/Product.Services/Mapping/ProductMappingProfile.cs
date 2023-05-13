@@ -14,8 +14,8 @@ namespace Services.Mapping
     {
         public ProductMappingProfile(string defaultImagePath)
         {
-            CreateMap<Product, DisplayProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
-            CreateMap<Product, CreateProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.Ignore()).ReverseMap();
+            CreateMap<Domain.Models.Product, DisplayProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.ImageSource)).ReverseMap();
+            CreateMap<Domain.Models.Product, CreateProductDTO>().ForMember(dest => dest.ImageSource, opt => opt.Ignore()).ReverseMap();
         }
     }
 }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Repositories
 {
-    public interface IProductRepository : IGenericRepository<Product>
+    public interface IProductRepository : IGenericRepository<Domain.Models.Product>
     {
-        Task<Product> GetDetailed(Guid id);
-        Task<IEnumerable<Product>> GetAllDetailed();
-        Task<IEnumerable<Product>> GetAllDetailedBySeller(Guid id);
+        Task<Domain.Models.Product> GetDetailed(Guid id);
+        Task<IEnumerable<Domain.Models.Product>> GetAllDetailed();
+        Task<IEnumerable<Domain.Models.Product>> GetAllDetailedBySeller(Guid id);
     }
 }

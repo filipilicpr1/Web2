@@ -49,6 +49,15 @@ namespace Presentation.Controllers
             return Ok(pagedProducts);
         }
 
+        [HttpGet("all")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAll2(int page)
+        {
+            Console.Out.WriteLine("CAO");
+            PagedListDTO<DisplayProductDTO> pagedProducts = await _productService.GetAll(page);
+            return Ok(pagedProducts);
+        }
+
         [HttpGet("seller/{id}")]
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetAll(Guid id, [FromQuery]int page)

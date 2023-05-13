@@ -9,34 +9,34 @@ using System.Threading.Tasks;
 
 namespace Persistence.Repositories
 {
-    public class ProductRepository : GenericRepository<Product>, IProductRepository
+    public class ProductRepository : GenericRepository<Domain.Models.Product>, IProductRepository
     {
-        public ProductRepository(ProjectDbContext dbContext) : base(dbContext)
+        public ProductRepository(ProductApiDbContext dbContext) : base(dbContext)
         {
 
         }
 
-        public async Task<IEnumerable<Product>> GetAllDetailed()
+        public async Task<IEnumerable<Domain.Models.Product>> GetAllDetailed()
         {
-            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller)
+            IEnumerable<Domain.Models.Product> products = await _dbContext.Products
                                                                      .Where(p => !p.IsDeleted)
                                                                      .OrderBy(p => p.Name)
                                                                      .ToListAsync();
             return products;
         }
 
-        public async Task<IEnumerable<Product>> GetAllDetailedBySeller(Guid id)
+        public async Task<IEnumerable<Domain.Models.Product>> GetAllDetailedBySeller(Guid id)
         {
-            IEnumerable<Product> products = await _dbContext.Products.Include(p => p.Seller)
-                                                                     .Where(p => !p.IsDeleted && p.Seller.Id == id)
+            IEnumerable<Domain.Models.Product> products = await _dbContext.Products
+                                                                     .Where(p => !p.IsDeleted && p.SellerId == id)
                                                                      .OrderBy(p => p.Name)
                                                                      .ToListAsync();
             return products;
         }
 
-        public async Task<Product> GetDetailed(Guid id)
+        public async Task<Domain.Models.Product> GetDetailed(Guid id)
         {
-            Product product = await _dbContext.Products.Include(p => p.Seller)
+            Domain.Models.Product product = await _dbContext.Products
                                                        .Where(p => p.Id == id)
                                                        .FirstOrDefaultAsync();
             return product;

@@ -24,10 +24,10 @@ namespace Services.Mapping
             CreateMap<OrderProduct, DisplayProductDTO>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Product.Id))
                                                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Product.Name))
                                                         .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Product.Description))
-                                                        .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
+                                                        .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
                                                         .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
-                                                        .ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.Product.ImageSource))
-                                                        .ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Product.Seller));
+                                                        .ForMember(dest => dest.ImageSource, opt => opt.MapFrom(src => defaultImagePath + src.Product.ImageSource));
+                                                        //.ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Product.Seller));
         }
 
         private string GetOrderStatus(Order order)

@@ -2,6 +2,7 @@
 using Contracts.Common;
 using Contracts.ProductDTOs;
 using Contracts.UserDTOs;
+using Dapr.Client;
 using Domain.AppSettings;
 using Domain.Enums;
 using Domain.Exceptions;
@@ -25,16 +26,18 @@ namespace Services
         private readonly IMapper _mapper;
         private readonly IOptions<AppSettings> _settings;
         private readonly IHostEnvironment _hostEnvironment;
-        public ProductService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment)
+        private readonly DaprClient _daprClient;
+        public ProductService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, DaprClient daprClient)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
+            _daprClient = daprClient;
         }
         public async Task<DisplayProductDTO> GetById(Guid id)
         {
-            Product product = await _unitOfWork.Products.GetDetailed(id);
+            Domain.Models.Product product = await _unitOfWork.Products.GetDetailed(id);
             if(product == null)
             {
                 throw new NotFoundException("Product with id " + id + " does not exist");
@@ -56,24 +59,33 @@ namespace Services
                 throw new BadRequestException(errorMessage);
             }
 
-            User seller = await _unitOfWork.Users.Find(createProductDTO.SellerId);
+
+            DisplayUserDTO seller = null;
+            try
+            {
+                seller = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + createProductDTO.SellerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting seller with id " + createProductDTO.SellerId);
+            }
+
             if(seller == null) 
             {
                 throw new BadRequestException("Seller with id " + createProductDTO.SellerId + " does not exist");
             }
 
-            if(!String.Equals(seller.Username, sellerUsername))
+            if (!String.Equals(seller.Username, sellerUsername))
             {
                 throw new BadRequestException("You can only add products for yourself");
             }
 
-            if(seller.VerificationStatus != VerificationStatuses.ACCEPTED)
+            if(!seller.IsVerified)
             {
                 throw new BadRequestException("Seller with username " + sellerUsername + " is not verified");
             }
 
-            Product product = _mapper.Map<Product>(createProductDTO);
-            product.Seller = seller;
+            Domain.Models.Product product = _mapper.Map<Domain.Models.Product>(createProductDTO);
             product.IsDeleted = false;
             await _unitOfWork.Products.Add(product);
 
@@ -86,25 +98,42 @@ namespace Services
         }
         public async Task<PagedListDTO<DisplayProductDTO>> GetAll(int page)
         {
-            IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailed();
-            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
+            IEnumerable<Domain.Models.Product> products = await _unitOfWork.Products.GetAllDetailed();
+            PagedListDTO<DisplayProductDTO> pagedList = PaginationHelper<Domain.Models.Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
+            return await GetSellersForProducts(pagedList, products);
         }
 
         public async Task<PagedListDTO<DisplayProductDTO>> GetAllBySeller(Guid id, int page)
         {
-            IEnumerable<Product> products = await _unitOfWork.Products.GetAllDetailedBySeller(id);
-            return PaginationHelper<Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
+            IEnumerable<Domain.Models.Product> products = await _unitOfWork.Products.GetAllDetailedBySeller(id);
+            PagedListDTO<DisplayProductDTO> pagedList = PaginationHelper<Domain.Models.Product, DisplayProductDTO>.CreatePagedListDTO(products, page, _settings.Value.ProductsPageSize, _mapper);
+            return await GetSellersForProducts(pagedList, products);
         }
 
         public async Task<DisplayProductDTO> UpdateProduct(Guid id, string sellerUsername, UpdateProductDTO updateProductDTO)
         {
-            Product product = await _unitOfWork.Products.GetDetailed(id);
+            Domain.Models.Product product = await _unitOfWork.Products.GetDetailed(id);
             if(product == null || product.IsDeleted)
             {
                 throw new NotFoundException("Product with id " + id + " does not exist");
             }
 
-            if(!String.Equals(product.Seller.Username, sellerUsername))
+            DisplayUserDTO seller = null;
+            try
+            {
+                seller = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + product.SellerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting seller with id " + product.SellerId);
+            }
+
+            if (seller == null)
+            {
+                throw new BadRequestException("Seller with id " + product.SellerId + " does not exist");
+            }
+
+            if(!String.Equals(seller.Username, sellerUsername))
             {
                 throw new BadRequestException("You can only update your products");
             }
@@ -141,13 +170,28 @@ namespace Services
 
         public async Task DeleteProduct(Guid id, string sellerUsername)
         {
-            Product product = await _unitOfWork.Products.GetDetailed(id);
+            Domain.Models.Product product = await _unitOfWork.Products.GetDetailed(id);
             if (product == null || product.IsDeleted)
             {
                 throw new NotFoundException("Product with id " + id + " does not exist");
             }
 
-            if (!String.Equals(product.Seller.Username, sellerUsername))
+            DisplayUserDTO seller = null;
+            try
+            {
+                seller = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + product.SellerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting seller with id " + product.SellerId);
+            }
+
+            if (seller == null)
+            {
+                throw new BadRequestException("Seller with id " + product.SellerId + " does not exist");
+            }
+
+            if (!String.Equals(seller.Username, sellerUsername))
             {
                 throw new BadRequestException("You can only delete your products");
             }
@@ -185,6 +229,20 @@ namespace Services
             }
 
             return true;
+        }
+
+        private async Task<PagedListDTO<DisplayProductDTO>> GetSellersForProducts(PagedListDTO<DisplayProductDTO> pagedList, IEnumerable<Domain.Models.Product> products) 
+        {
+            List<Domain.Models.Product> productsList = products.ToList();
+            foreach(DisplayProductDTO item in pagedList.Items)
+            {
+                item.Seller = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + productsList.Find(product => product.Id == item.Id).SellerId);
+            }
+            /*for (int i = 0; i < productsList.Count; i++)
+            {
+                pagedList.Items[i].Seller = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + productsList[i].SellerId);
+            }*/
+            return pagedList;
         }
     }
 }

@@ -9,20 +9,17 @@ namespace Persistence.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ProjectDbContext _dbContext;
-        public IUserRepository Users { get; }
+        private readonly ProductApiDbContext _dbContext;
         public IProductRepository Products { get; }
         public IOrderRepository Orders { get; }
         public IOrderProductRepository OrderProducts { get; }
 
-        public UnitOfWork(ProjectDbContext dbContext,
-                          IUserRepository users,
+        public UnitOfWork(ProductApiDbContext dbContext,
                           IProductRepository products,
                           IOrderRepository orders,
                           IOrderProductRepository orderPrdocuts)
         {
             _dbContext = dbContext;
-            Users = users;
             Products = products;
             Orders = orders;
             OrderProducts = orderPrdocuts;

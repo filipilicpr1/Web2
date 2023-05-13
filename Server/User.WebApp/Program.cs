@@ -91,12 +91,9 @@ builder.Services.AddScoped<IEmailUtility, EmailUtility>();
 builder.Services.AddScoped<ITokenUtility, TokenUtility>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProjectDatabase"), b => b.MigrationsAssembly("WebApp")));
+builder.Services.AddDbContext<UserApiDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserApiDatabase"), b => b.MigrationsAssembly("User.WebApp")));
 
 builder.Services.AddScoped(provider => new MapperConfiguration(cfg =>
 {
@@ -110,7 +107,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     // apply new migrations on startup
-    var context = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<UserApiDbContext>();
     context.Database.EnsureCreated();
 }
 

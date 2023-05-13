@@ -10,9 +10,9 @@ namespace Persistence.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly ProjectDbContext _dbContext;
+        protected readonly UserApiDbContext _dbContext;
 
-        public GenericRepository(ProjectDbContext dbContext)
+        public GenericRepository(UserApiDbContext dbContext)
         {
             _dbContext = dbContext;
         }

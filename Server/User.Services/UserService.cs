@@ -28,6 +28,7 @@ using Domain.Utilities;
 using Google.Apis.Auth;
 using Newtonsoft.Json.Linq;
 using Google.Apis.Auth.OAuth2;
+using Contracts.ProductDTOs;
 
 namespace Services
 {
@@ -39,7 +40,8 @@ namespace Services
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IEmailUtility _emailUtility;
         private readonly ITokenUtility _tokenUtility;
-        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, IEmailUtility emailUtility, ITokenUtility tokenUtility)
+        //private readonly DaprClient _daprClient;
+        public UserService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IHostEnvironment hostEnvironment, IEmailUtility emailUtility, ITokenUtility tokenUtility)//, DaprClient daprClient)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
@@ -47,10 +49,12 @@ namespace Services
             _hostEnvironment = hostEnvironment;
             _emailUtility = emailUtility;
             _tokenUtility = tokenUtility;
+            //_daprClient = daprClient;
         }
 
         public async Task<DisplayUserDTO> GetById(Guid id)
         {
+            await Console.Out.WriteLineAsync(id.ToString());
             User user = await _unitOfWork.Users.Find(id);
             if (user == null) 
             {
@@ -62,6 +66,8 @@ namespace Services
 
         public async Task<AuthDTO> Login(LoginDTO loginDTO)
         {
+            //var items = await _daprClient.InvokeMethodAsync<PagedListDTO<DisplayProductDTO>>(HttpMethod.Get, "productapi", "api/products/all");
+            //await Console.Out.WriteLineAsync(items.TotalPages.ToString());
             string message = "";
 
             bool emailISValid = ValidateEmail(loginDTO.Email, out message);

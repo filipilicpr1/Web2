@@ -10,7 +10,7 @@ namespace Persistence.Repositories
 {
     public class OrderProductRepository : GenericRepository<OrderProduct>, IOrderProductRepository
     {
-        public OrderProductRepository(ProjectDbContext dbContext) : base(dbContext)
+        public OrderProductRepository(ProductApiDbContext dbContext) : base(dbContext)
         {
 
         }

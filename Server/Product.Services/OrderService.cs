@@ -18,6 +18,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contracts.UserDTOs;
+using Dapr.Client;
+using Google.Api;
 
 namespace Services
 {
@@ -27,12 +30,14 @@ namespace Services
         private readonly IMapper _mapper;
         private readonly IOptions<AppSettings> _settings;
         private readonly IRandomUtility _randomUtility;
-        public OrderService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IRandomUtility randomUtility)
+        private readonly DaprClient _daprClient;
+        public OrderService(IOptions<AppSettings> settings, IUnitOfWork unitOfWork, IMapper mapper, IRandomUtility randomUtility, DaprClient daprClient)
         {
             _settings = settings;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _randomUtility = randomUtility;
+            _daprClient = daprClient;
         }
 
         public async Task<DisplayOrderDTO> GetById(Guid id)
@@ -43,7 +48,29 @@ namespace Services
                 throw new NotFoundException("Order with id " + id + " does not exist");
             }
 
-            return _mapper.Map<DisplayOrderDTO>(order);
+            RestrictedDisplayUserDTO buyer = null;
+            try
+            {
+                buyer = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + order.BuyerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting buyer with id " + order.BuyerId);
+            }
+
+            if (buyer == null)
+            {
+                throw new BadRequestException("Buyer with id " + order.BuyerId + " does not exist");
+            }
+
+            DisplayOrderDTO displayOrderDTO = _mapper.Map<DisplayOrderDTO>(order);
+            displayOrderDTO.Buyer = buyer;
+
+            for(int i = 0; i < order.OrderProducts.Count; i++)
+            {
+                displayOrderDTO.OrderProducts[i].Seller = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + order.OrderProducts[i].Product.SellerId);
+            }
+            return displayOrderDTO;
         }
 
         public async Task<DisplayOrderDTO> CreateOrder(string buyerUsername, CreateOrderDTO createOrderDTO)
@@ -55,24 +82,32 @@ namespace Services
                 throw new BadRequestException("Delivery address cannot be empty");
             }
 
-            User buyer = await _unitOfWork.Users.Find(createOrderDTO.BuyerId);
-            if(buyer == null) 
+            DisplayUserDTO buyer = null;
+            try
+            {
+                buyer = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + createOrderDTO.BuyerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting buyer with id " + createOrderDTO.BuyerId);
+            }
+
+            if (buyer == null)
             {
                 throw new BadRequestException("Buyer with id " + createOrderDTO.BuyerId + " does not exist");
             }
 
-            if(!String.Equals(buyer.Username, buyerUsername))
+            if (!String.Equals(buyer.Username, buyerUsername))
             {
                 throw new BadRequestException("You can only make orders for yourself");
             }
 
-            if(createOrderDTO.OrderProducts == null || createOrderDTO.OrderProducts.Count() == 0) 
+            if (createOrderDTO.OrderProducts == null || createOrderDTO.OrderProducts.Count() == 0) 
             {
                 throw new BadRequestException("Order must have at least 1 product");
             }
 
             Order order = _mapper.Map<Order>(createOrderDTO);
-            order.Buyer = buyer; 
             order.IsCanceled = false;
             await _unitOfWork.Orders.Add(order);
 
@@ -80,7 +115,7 @@ namespace Services
             List<Guid> sellerIds = new List<Guid>();
             foreach (CreateOrderProductDTO createOrderProductDTO in createOrderDTO.OrderProducts)
             {
-                Product product = await _unitOfWork.Products.Find(createOrderProductDTO.ProductId);
+                Domain.Models.Product product = await _unitOfWork.Products.Find(createOrderProductDTO.ProductId);
 
                 if(product == null || product.IsDeleted) 
                 {
@@ -96,7 +131,8 @@ namespace Services
                 {
                     ProductId = createOrderProductDTO.ProductId,
                     OrderId =  order.Id,
-                    Amount = createOrderProductDTO.Amount
+                    Amount = createOrderProductDTO.Amount,
+                    Price = product.Price
                 };
 
                 await _unitOfWork.OrderProducts.Add(orderProduct);
@@ -125,12 +161,27 @@ namespace Services
                 throw new NotFoundException("Order with id " + id + " does not exist");
             }
 
-            if(!String.Equals(order.Buyer.Username, buyerUsername))
+            DisplayUserDTO buyer = null;
+            try
+            {
+                buyer = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + order.BuyerId);
+            }
+            catch
+            {
+                throw new BadRequestException("Error getting buyer with id " + order.BuyerId);
+            }
+
+            if (buyer == null)
+            {
+                throw new BadRequestException("Buyer with id " + order.BuyerId + " does not exist");
+            }
+
+            if (!String.Equals(buyer.Username, buyerUsername))
             {
                 throw new BadRequestException("You can only cancel your orders");
             }
 
-            if(order.IsCanceled)
+            if (order.IsCanceled)
             {
                 throw new BadRequestException("Order with id " + id + " has already been canceled");
             }
@@ -153,31 +204,50 @@ namespace Services
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredByBuyer(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetNonDeliveredDetailedByBuyer(id);
-            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.BuyerOrdersPageSize, _mapper);
+            PagedListDTO<DisplayOrderDTO> pagedList =  PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.BuyerOrdersPageSize, _mapper);
+            return await GetBuyerAndSellers(pagedList, orders);
         }
 
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredByBuyer(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredDetailedByBuyer(id);
-            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.BuyerOrdersPageSize, _mapper);
+            PagedListDTO<DisplayOrderDTO> pagedList = PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.BuyerOrdersPageSize, _mapper);
+            return await GetBuyerAndSellers(pagedList, orders);
         }
 
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllNonDeliveredBySeller(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetNonDeliveredDetailedBySeller(id);
-            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            PagedListDTO<DisplayOrderDTO> pagedList = PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            return await GetBuyerAndSellers(pagedList, orders);
         }
 
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDeliveredOrCanceledBySeller(Guid id, int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetDeliveredOrCanceledDetailedBySeller(id);
-            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            PagedListDTO<DisplayOrderDTO> pagedList = PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            return await GetBuyerAndSellers(pagedList, orders);
         }
 
         public async Task<PagedListDTO<DisplayOrderDTO>> GetAllDetailed(int page)
         {
             IEnumerable<Order> orders = await _unitOfWork.Orders.GetAllDetailed();
-            return PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            PagedListDTO<DisplayOrderDTO> pagedList = PaginationHelper<Order, DisplayOrderDTO>.CreatePagedListDTO(orders, page, _settings.Value.OrdersPageSize, _mapper);
+            return await GetBuyerAndSellers(pagedList, orders);
+        }
+
+        private async Task<PagedListDTO<DisplayOrderDTO>> GetBuyerAndSellers(PagedListDTO<DisplayOrderDTO> pagedList, IEnumerable<Order> orders)
+        {
+            var ordersList = orders.ToList();
+            foreach (var item in pagedList.Items)
+            {
+                item.Buyer = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + ordersList.Find(order => order.Id == item.Id).BuyerId);
+                foreach (var product in item.OrderProducts)
+                {
+                    product.Seller = await _daprClient.InvokeMethodAsync<RestrictedDisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + ordersList.Find(order => order.Id == item.Id).OrderProducts.Find(op => op.ProductId == product.Id).Product.SellerId);
+                }
+            }
+            return pagedList;
         }
     }
 }
