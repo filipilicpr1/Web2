@@ -89,6 +89,7 @@ builder.Services.AddOptions();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailUtility, EmailUtility>();
 builder.Services.AddScoped<ITokenUtility, TokenUtility>();
+builder.Services.AddScoped<IDataInitializer, DataInitializer>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -109,6 +110,7 @@ using (var scope = app.Services.CreateScope())
     // apply new migrations on startup
     var context = scope.ServiceProvider.GetRequiredService<UserApiDbContext>();
     context.Database.EnsureCreated();
+    scope.ServiceProvider.GetRequiredService<IDataInitializer>().InitializeData();
 }
 
 // Configure the HTTP request pipeline.

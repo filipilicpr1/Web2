@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts.UserDTOs
+namespace Domain.Utilities
 {
-    public class GoogleLoginDTO
+    public interface IDataInitializer
     {
-        public string Token { get; set; }
+        void InitializeData();
     }
 }

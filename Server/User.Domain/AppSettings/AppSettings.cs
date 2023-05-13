@@ -16,6 +16,8 @@ namespace Domain.AppSettings
         public string DefaultAddress { get; set; }
         public string DefaultBirthDate { get; set; }
         public string DefaultPassword { get; set; }
+        public string AdminName { get; set; }
+        public string AdminEmail { get; set; }
         public int UsersPageSize { get; set; }
         public string TokenIssuer { get; set; }
         public int TokenDuration { get; set; }
