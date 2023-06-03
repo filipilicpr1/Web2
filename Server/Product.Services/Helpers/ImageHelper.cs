@@ -14,7 +14,7 @@ namespace Services.Helpers
         {
             string imageName = new string(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
             imageName = imageName + id.ToString() + Path.GetExtension(imageFile.FileName);
-            var imagePath = Path.Combine(rootPath, "../Product.Persistence/Images", imageName);
+            var imagePath = Path.Combine(rootPath, "images", imageName);
 
             using (var fileStream = new FileStream(imagePath, FileMode.Create))
             {
@@ -26,7 +26,7 @@ namespace Services.Helpers
 
         public static void DeleteImage(string imageName, string rootPath)
         {
-            var imagePath = Path.Combine(rootPath, "../Product.Persistence/Images", imageName);
+            var imagePath = Path.Combine(rootPath, "images", imageName);
             if (File.Exists(imagePath))
             {
                 File.Delete(imagePath);

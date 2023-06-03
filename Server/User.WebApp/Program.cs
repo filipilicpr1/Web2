@@ -124,7 +124,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "../User.Persistence/Images")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images")),
     RequestPath = "/Images"
 });
 

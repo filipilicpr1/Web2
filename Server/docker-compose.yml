@@ -1,0 +1,62 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  productapi:
+    image: productapi
+    container_name: productapi
+    ports:
+      - "7126:80"
+    depends_on:
+      - product-db
+  product-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: product-db
+    ports: # not actually needed, because the two services are on the same network
+      - "1433:1433" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+  
+  userapi:
+    image: userapi
+    container_name: userapi
+    ports:
+      - "7127:80"
+    depends_on:
+      - user-db
+  user-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: user-db
+    ports: # not actually needed, because the two services are on the same network
+      - "1434:1434" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+
+  ocelotgateway:
+    image: ocelotgateway
+    container_name: ocelotgateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "7125:80"
+    depends_on:
+      - userapi
+      - productapi
+
+  userapi-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "userapi", "-app-port", "80", "-components-path", "/components" ]
+    depends_on:
+      - userapi
+    volumes:
+      - "./components/:/components"
+    network_mode: "service:userapi"
+
+  productapi-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "productapi", "-app-port", "80", "-components-path", "/components" ]
+    depends_on:
+      - productapi
+    volumes:
+      - "./components/:/components"
+    network_mode: "service:productapi"

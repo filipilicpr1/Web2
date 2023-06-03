@@ -65,9 +65,10 @@ namespace Services
             {
                 seller = await _daprClient.InvokeMethodAsync<DisplayUserDTO>(HttpMethod.Get, "userapi", "api/users/" + createProductDTO.SellerId);
             }
-            catch
+            catch(Exception e)
             {
-                throw new BadRequestException("Error getting seller with id " + createProductDTO.SellerId);
+                //throw new BadRequestException("Error getting seller with id " + createProductDTO.SellerId);
+                throw new BadRequestException(e.Message);
             }
 
             if(seller == null) 

@@ -14,6 +14,10 @@ import DetailedOrderActions from "./DetailedOrderActions";
 
 const DetailedOrder: FC = () => {
   const order = useAppSelector((state) => state.orders.detailedOrder);
+  const orderDate = order == null ? new Date() : new Date(order.orderTime);
+  orderDate.setHours(orderDate.getHours() + 2);
+  const deliveryDate = order == null ? new Date() : new Date(order.deliveryTime);
+  deliveryDate.setHours(deliveryDate.getHours() + 2);
 
   return (
     <>
@@ -50,12 +54,12 @@ const DetailedOrder: FC = () => {
               <DetailedPageItem
                 id="orderTime"
                 label="Order Time"
-                value={new Date(order.orderTime).toLocaleString("en-GB")}
+                value={orderDate.toLocaleString("en-GB")}
               />
               <DetailedPageItem
                 id="deliveryTime"
                 label="Delivery Time"
-                value={new Date(order.deliveryTime).toLocaleString("en-GB")}
+                value={deliveryDate.toLocaleString("en-GB")}
               />
               <DetailedPageItem
                 id="address"

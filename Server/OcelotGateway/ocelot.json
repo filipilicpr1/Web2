@@ -1,17 +1,17 @@
 {
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7125"
+    "BaseUrl": "http://localhost:7125"
   },
   "Routes": [
     {
       "UpstreamPathTemplate": "/gateway/products",
       "UpstreamHttpMethod": [ "Get", "Post" ],
       "DownstreamPathTemplate": "/api/products",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -19,11 +19,11 @@
       "UpstreamPathTemplate": "/gateway/products/{id}",
       "UpstreamHttpMethod": [ "Get", "Delete", "Put" ],
       "DownstreamPathTemplate": "/api/products/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -31,11 +31,11 @@
       "UpstreamPathTemplate": "/gateway/products/seller/{id}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/products/seller/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -43,11 +43,11 @@
       "UpstreamPathTemplate": "/gateway/orders",
       "UpstreamHttpMethod": [ "Get", "Post" ],
       "DownstreamPathTemplate": "/api/orders",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -55,11 +55,11 @@
       "UpstreamPathTemplate": "/gateway/orders/{id}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/orders/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -67,11 +67,11 @@
       "UpstreamPathTemplate": "/gateway/orders/{id}/cancel",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/orders/{id}/cancel",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -79,11 +79,11 @@
       "UpstreamPathTemplate": "/gateway/orders/buyer/{id}/in-progress",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/orders/buyer/{id}/in-progress",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -91,11 +91,11 @@
       "UpstreamPathTemplate": "/gateway/orders/buyer/{id}/delivered",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/orders/buyer/{id}/delivered",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -103,11 +103,11 @@
       "UpstreamPathTemplate": "/gateway/orders/seller/{id}/in-progress",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/orders/seller/{id}/in-progress",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -115,11 +115,11 @@
       "UpstreamPathTemplate": "/gateway/orders/seller/{id}/delivered-or-canceled",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/orders/seller/{id}/delivered-or-canceled",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7126
+          "Host": "productapi",
+          "Port": 80
         }
       ]
     },
@@ -127,11 +127,11 @@
       "UpstreamPathTemplate": "/gateway/users",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/users",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -139,11 +139,11 @@
       "UpstreamPathTemplate": "/gateway/users/{id}",
       "UpstreamHttpMethod": [ "Get", "Delete", "Put" ],
       "DownstreamPathTemplate": "/api/users/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -151,11 +151,11 @@
       "UpstreamPathTemplate": "/gateway/users",
       "UpstreamHttpMethod": [ "Post", "Put" ],
       "DownstreamPathTemplate": "/api/users",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -163,23 +163,24 @@
       "UpstreamPathTemplate": "/gateway/users/login",
       "UpstreamHttpMethod": [ "Post" ],
       "DownstreamPathTemplate": "/api/users/login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
-      ]
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
       "UpstreamPathTemplate": "/gateway/users/{id}/change-password",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/users/{id}/change-password",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -187,11 +188,11 @@
       "UpstreamPathTemplate": "/gateway/users/{id}/verify",
       "UpstreamHttpMethod": [ "Put" ],
       "DownstreamPathTemplate": "/api/users/{id}/verify",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -199,11 +200,11 @@
       "UpstreamPathTemplate": "/gateway/users/sellers",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/users/sellers",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -211,11 +212,11 @@
       "UpstreamPathTemplate": "/gateway/users/sellers/verified",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/api/users/sellers/verified",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -223,11 +224,11 @@
       "UpstreamPathTemplate": "/gateway/users/google-login",
       "UpstreamHttpMethod": [ "Post" ],
       "DownstreamPathTemplate": "/api/users/google-login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     },
@@ -235,11 +236,11 @@
       "UpstreamPathTemplate": "/gateway/users/{id}/finish-registration",
       "UpstreamHttpMethod": [ "Post" ],
       "DownstreamPathTemplate": "/api/users/{id}/finish-registration",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7127
+          "Host": "userapi",
+          "Port": 80
         }
       ]
     }
