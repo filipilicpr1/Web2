@@ -21,7 +21,7 @@ namespace Persistence.Repositories
             List<Order> orders = await _dbContext.Orders
                                                         .Include(o => o.OrderProducts)
                                                         .ThenInclude(op => op.Product)
-                                                        .Where(o => o.DeliveryTime < DateTime.Now)
+                                                        .Where(o => o.DeliveryTime < DateTime.Now || o.IsCanceled)
                                                         .OrderByDescending(o => o.OrderTime)
                                                         .ToListAsync();
             return orders.FindAll(o => o.OrderProducts.FindAll(op => op.Product.SellerId == id).Count != 0);
