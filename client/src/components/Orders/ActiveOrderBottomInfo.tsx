@@ -8,10 +8,13 @@ interface IProps {
 
 const ActiveOrderBottomInfo: FC<IProps> = (props) => {
   const today = new Date();
-  const hours = props.deliveryTime.getHours() - today.getHours();
-  const mins = props.deliveryTime.getMinutes() - today.getMinutes();
+  const deliveryDate = new Date(props.deliveryTime);
+  deliveryDate.setHours(deliveryDate.getHours() + 2);
+  const hours = deliveryDate.getHours() - today.getHours();
+  const mins = deliveryDate.getMinutes() - today.getMinutes();
   const adjustedMins = hours * 60 + mins;
-  const orderDate = new Date(props.orderTime).toLocaleString("en-GB");
+  const orderDate = new Date(props.orderTime);
+  orderDate.setHours(orderDate.getHours() + 2);
 
   return (
     <>
@@ -27,7 +30,7 @@ const ActiveOrderBottomInfo: FC<IProps> = (props) => {
         }}
       >
         <Typography mt={-1} variant="body1" color="text.secondary">
-          {orderDate}
+          {orderDate.toLocaleString("en-GB")}
         </Typography>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>

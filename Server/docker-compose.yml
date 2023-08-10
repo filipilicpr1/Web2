@@ -1,0 +1,64 @@
+version: '3.9'
+services: 
+  userapi:
+    image: ${DOCKER_REGISTRY-}userapi
+    build:
+      context: .
+      dockerfile: User.WebApp/Dockerfile
+    ports:
+      - "7127:80"
+    depends_on:
+      - user-db
+      
+  user-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: user-db
+    ports:
+      - "1434:1434" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+
+  userapi-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "userapi", "-app-port", "80", "-components-path", "/components" ]
+    depends_on:
+      - userapi
+    network_mode: "service:userapi"
+
+  productapi:
+    image: ${DOCKER_REGISTRY-}productapi
+    build:
+      context: .
+      dockerfile: Product.WebApp/Dockerfile
+    ports:
+      - "7126:80"
+    depends_on:
+      - product-db
+      
+  product-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: product-db
+    ports:
+      - "1433:1433" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+
+  productapi-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "productapi", "-app-port", "80", "-components-path", "/components" ]
+    depends_on:
+      - productapi
+    network_mode: "service:productapi"
+
+  ocelotgateway:
+    image: ${DOCKER_REGISTRY-}ocelotgateway
+    build:
+      context: .
+      dockerfile: OcelotGateway/Dockerfile
+    ports:
+      - "7125:80"
+    depends_on:
+      - productapi
+      - userapi

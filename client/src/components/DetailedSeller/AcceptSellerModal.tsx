@@ -55,9 +55,9 @@ const AcceptSellerModal: FC<IProps> = (props) => {
                   sx={{
                     width: "80%",
                     borderRadius: "25px",
-                    bgcolor: "#29539b",
+                    bgcolor: "#990000",
                     backgroundImage:
-                      "linear-gradient(315deg, #29539b 0%, #1e3b70 74%)",
+                      "linear-gradient(147deg, #990000 0%, #ff0000 74%)",
                     order: 3,
                     mb: 2,
                     "&:hover": {
@@ -76,9 +76,9 @@ const AcceptSellerModal: FC<IProps> = (props) => {
                   sx={{
                     width: "80%",
                     borderRadius: "25px",
-                    bgcolor: "#990000",
+                    bgcolor: "#29539b",
                     backgroundImage:
-                      "linear-gradient(147deg, #990000 0%, #ff0000 74%)",
+                      "linear-gradient(315deg, #29539b 0%, #1e3b70 74%)",
                     order: 4,
                     mb: 2,
                     ml: 2,
